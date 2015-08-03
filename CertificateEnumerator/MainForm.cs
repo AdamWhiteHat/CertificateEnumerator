@@ -9,8 +9,9 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using CertificateEnumerator;
 
+using ConversionUtilities;
+using CertificateEnumerator;
 
 namespace CertificateEnumeratorGUI
 {
@@ -98,6 +99,10 @@ namespace CertificateEnumeratorGUI
 					case ".csv":
 						SaveCells_AsCSV(filename);
 						break;
+					case ".xls":
+					case ".xlsx":
+						SaveCells_AsXLSX(filename);
+						break;
 					default:
 						SaveCells_AsTEXT(filename);
 						break;
@@ -125,6 +130,20 @@ namespace CertificateEnumeratorGUI
 			clipBoard = clipBoard.Substring(start);
 
 			File.WriteAllText(filename, clipBoard);	
+		}
+
+		private void SaveCells_AsXLSX(string filename)
+		{
+			string fileTemp = Path.GetTempFileName();
+			SaveCells_AsCSV(fileTemp);
+			if (File.Exists(fileTemp))
+			{
+				if (ExcelConverter.Convert(fileTemp, filename, Microsoft.Office.Interop.Excel.XlFileFormat.xlExcel9795))
+				{
+					return;
+				}
+			}
+			MessageBox.Show("Unable to convert file to EXCEL file. Perhaps excel is not installed?");
 		}
 
 		IDataObject objectSave = null;

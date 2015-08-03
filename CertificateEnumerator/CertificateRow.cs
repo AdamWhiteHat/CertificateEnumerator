@@ -9,7 +9,7 @@ namespace CertificateEnumerator
 {
 	public class CertificateRow
 	{
-		public bool HasPrivateKey { get; set; }
+		public bool PrivateKey { get; set; }
 		public bool IsVerified { get; set; }
 		public string StoreLocation { get; set; }
 		public string StoreName { get; set; }
@@ -23,7 +23,7 @@ namespace CertificateEnumerator
 		{
 			_cert = certificate;
 			Algorithm = _cert.GetKeyAlgorithm();
-			HasPrivateKey = _cert.HasPrivateKey;
+			PrivateKey = _cert.HasPrivateKey;
 			SerialNumber = _cert.SerialNumber;
 			Thumbprint = _cert.Thumbprint;
 			FriendlyName = _cert.FriendlyName;

@@ -41,14 +41,14 @@
 			// 
 			// tbOutput
 			// 
-			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbOutput.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.tbOutput.Location = new System.Drawing.Point(2, 29);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(668, 172);
+			this.tbOutput.Size = new System.Drawing.Size(680, 172);
 			this.tbOutput.TabIndex = 0;
 			this.tbOutput.WordWrap = false;
 			// 
@@ -76,7 +76,7 @@
 			this.dataGridViewCertificates.ReadOnly = true;
 			this.dataGridViewCertificates.RowHeadersVisible = false;
 			this.dataGridViewCertificates.RowHeadersWidth = 5;
-			this.dataGridViewCertificates.Size = new System.Drawing.Size(668, 271);
+			this.dataGridViewCertificates.Size = new System.Drawing.Size(680, 183);
 			this.dataGridViewCertificates.TabIndex = 4;
 			// 
 			// btnVerifyCerts
@@ -92,7 +92,7 @@
 			// btnSaveTextAs
 			// 
 			this.btnSaveTextAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSaveTextAs.Location = new System.Drawing.Point(423, 2);
+			this.btnSaveTextAs.Location = new System.Drawing.Point(435, 2);
 			this.btnSaveTextAs.Name = "btnSaveTextAs";
 			this.btnSaveTextAs.Size = new System.Drawing.Size(100, 23);
 			this.btnSaveTextAs.TabIndex = 6;
@@ -103,7 +103,7 @@
 			// btnSaveCellsAs
 			// 
 			this.btnSaveCellsAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSaveCellsAs.Location = new System.Drawing.Point(529, 2);
+			this.btnSaveCellsAs.Location = new System.Drawing.Point(541, 2);
 			this.btnSaveCellsAs.Name = "btnSaveCellsAs";
 			this.btnSaveCellsAs.Size = new System.Drawing.Size(141, 23);
 			this.btnSaveCellsAs.TabIndex = 7;
@@ -114,19 +114,21 @@
 			// saveFileDialogSelectedCells
 			// 
 			this.saveFileDialogSelectedCells.DefaultExt = "txt";
-			this.saveFileDialogSelectedCells.Filter = "Text files|*.txt|Html files|*.html|CSV File|*.csv|All Files|*.*";
+			this.saveFileDialogSelectedCells.Filter = "Text files|*.txt|Html files|*.html|CSV File|*.csv|Excel File|*.xlsx|All Files|*.*" +
+    "";
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(672, 479);
+			this.ClientSize = new System.Drawing.Size(684, 391);
 			this.Controls.Add(this.btnSaveCellsAs);
 			this.Controls.Add(this.btnSaveTextAs);
 			this.Controls.Add(this.btnVerifyCerts);
 			this.Controls.Add(this.dataGridViewCertificates);
 			this.Controls.Add(this.btnEnumerate);
 			this.Controls.Add(this.tbOutput);
+			this.MinimumSize = new System.Drawing.Size(430, 430);
 			this.Name = "MainForm";
 			this.Text = "Certificate Enumerator";
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCertificates)).EndInit();
