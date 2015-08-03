@@ -9,14 +9,14 @@ namespace CertificateEnumerator
 {
 	public class CertificateRow
 	{
-		public bool HasPrivateKey	{ get; set; }
-		public bool HasBeenVerified { get; set; }
-		public string StoreLocation	{ get; set; }
-		public string StoreName		{ get; set; }
-		public string FriendlyName	{ get; set; }
-		public string SerialNumber	{ get; set; }
-		public string Thumbprint	{ get; set; }
-		public string Algorithm		{ get; set; }
+		public bool HasPrivateKey { get; set; }
+		public bool IsVerified { get; set; }
+		public string StoreLocation { get; set; }
+		public string StoreName { get; set; }
+		public string FriendlyName { get; set; }
+		public string SerialNumber { get; set; }
+		public string Thumbprint { get; set; }
+		public string Algorithm { get; set; }
 		private X509Certificate2 _cert;
 
 		public CertificateRow(X509Certificate2 certificate)
@@ -25,7 +25,7 @@ namespace CertificateEnumerator
 			Algorithm = _cert.GetKeyAlgorithm();
 			HasPrivateKey = _cert.HasPrivateKey;
 			SerialNumber = _cert.SerialNumber;
-			Thumbprint = _cert.Thumbprint;			
+			Thumbprint = _cert.Thumbprint;
 			FriendlyName = _cert.FriendlyName;
 			if (string.IsNullOrWhiteSpace(FriendlyName))
 			{
@@ -41,7 +41,7 @@ namespace CertificateEnumerator
 				CertificateRow newRow = new CertificateRow(cert);
 				newRow.StoreName = store.Name;
 				newRow.StoreLocation = store.Location.ToString();
-				results.Add(newRow);				
+				results.Add(newRow);
 			}
 			return results;
 		}
@@ -50,7 +50,7 @@ namespace CertificateEnumerator
 		{
 			if (_cert != null)
 			{
-				HasBeenVerified = _cert.Verify();
+				IsVerified = _cert.Verify();
 			}
 		}
 	}

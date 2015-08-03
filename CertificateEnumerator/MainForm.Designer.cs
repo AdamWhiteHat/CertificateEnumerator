@@ -1,4 +1,4 @@
-﻿namespace CertificateEnumerator
+﻿namespace CertificateEnumeratorGUI
 {
 	partial class MainForm
 	{
@@ -30,22 +30,21 @@
 		{
 			this.tbOutput = new System.Windows.Forms.TextBox();
 			this.btnEnumerate = new System.Windows.Forms.Button();
-			this.selectStoreLocation = new System.Windows.Forms.ComboBox();
-			this.selectStoreName = new System.Windows.Forms.ListBox();
 			this.dataGridViewCertificates = new System.Windows.Forms.DataGridView();
 			this.btnVerifyCerts = new System.Windows.Forms.Button();
-			this.btnSaveAs = new System.Windows.Forms.Button();
-			this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+			this.btnSaveTextAs = new System.Windows.Forms.Button();
+			this.saveFileDialogText = new System.Windows.Forms.SaveFileDialog();
+			this.btnSaveCellsAs = new System.Windows.Forms.Button();
+			this.saveFileDialogSelectedCells = new System.Windows.Forms.SaveFileDialog();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCertificates)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// tbOutput
 			// 
-			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbOutput.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.tbOutput.Location = new System.Drawing.Point(2, 108);
+			this.tbOutput.Location = new System.Drawing.Point(2, 29);
 			this.tbOutput.Multiline = true;
 			this.tbOutput.Name = "tbOutput";
 			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -55,31 +54,13 @@
 			// 
 			// btnEnumerate
 			// 
-			this.btnEnumerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnEnumerate.Location = new System.Drawing.Point(504, 12);
+			this.btnEnumerate.Location = new System.Drawing.Point(2, 2);
 			this.btnEnumerate.Name = "btnEnumerate";
 			this.btnEnumerate.Size = new System.Drawing.Size(75, 23);
 			this.btnEnumerate.TabIndex = 1;
 			this.btnEnumerate.Text = "Enumerate";
 			this.btnEnumerate.UseVisualStyleBackColor = true;
 			this.btnEnumerate.Click += new System.EventHandler(this.btnEnumerate_Click);
-			// 
-			// selectStoreLocation
-			// 
-			this.selectStoreLocation.FormattingEnabled = true;
-			this.selectStoreLocation.Location = new System.Drawing.Point(12, 7);
-			this.selectStoreLocation.Name = "selectStoreLocation";
-			this.selectStoreLocation.Size = new System.Drawing.Size(113, 21);
-			this.selectStoreLocation.TabIndex = 2;
-			// 
-			// selectStoreName
-			// 
-			this.selectStoreName.FormattingEnabled = true;
-			this.selectStoreName.Location = new System.Drawing.Point(131, 7);
-			this.selectStoreName.Name = "selectStoreName";
-			this.selectStoreName.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.selectStoreName.Size = new System.Drawing.Size(160, 95);
-			this.selectStoreName.TabIndex = 3;
 			// 
 			// dataGridViewCertificates
 			// 
@@ -90,18 +71,17 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.dataGridViewCertificates.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-			this.dataGridViewCertificates.Location = new System.Drawing.Point(2, 286);
+			this.dataGridViewCertificates.Location = new System.Drawing.Point(2, 205);
 			this.dataGridViewCertificates.Name = "dataGridViewCertificates";
 			this.dataGridViewCertificates.ReadOnly = true;
 			this.dataGridViewCertificates.RowHeadersVisible = false;
 			this.dataGridViewCertificates.RowHeadersWidth = 5;
-			this.dataGridViewCertificates.Size = new System.Drawing.Size(668, 191);
+			this.dataGridViewCertificates.Size = new System.Drawing.Size(668, 271);
 			this.dataGridViewCertificates.TabIndex = 4;
 			// 
 			// btnVerifyCerts
 			// 
-			this.btnVerifyCerts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnVerifyCerts.Location = new System.Drawing.Point(585, 41);
+			this.btnVerifyCerts.Location = new System.Drawing.Point(83, 2);
 			this.btnVerifyCerts.Name = "btnVerifyCerts";
 			this.btnVerifyCerts.Size = new System.Drawing.Size(75, 23);
 			this.btnVerifyCerts.TabIndex = 5;
@@ -109,27 +89,42 @@
 			this.btnVerifyCerts.UseVisualStyleBackColor = true;
 			this.btnVerifyCerts.Click += new System.EventHandler(this.btnVerifyCerts_Click);
 			// 
-			// btnSaveAs
+			// btnSaveTextAs
 			// 
-			this.btnSaveAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSaveAs.Location = new System.Drawing.Point(585, 12);
-			this.btnSaveAs.Name = "btnSaveAs";
-			this.btnSaveAs.Size = new System.Drawing.Size(75, 23);
-			this.btnSaveAs.TabIndex = 6;
-			this.btnSaveAs.Text = "Save as...";
-			this.btnSaveAs.UseVisualStyleBackColor = true;
-			this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+			this.btnSaveTextAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSaveTextAs.Location = new System.Drawing.Point(423, 2);
+			this.btnSaveTextAs.Name = "btnSaveTextAs";
+			this.btnSaveTextAs.Size = new System.Drawing.Size(100, 23);
+			this.btnSaveTextAs.TabIndex = 6;
+			this.btnSaveTextAs.Text = "Save text as...";
+			this.btnSaveTextAs.UseVisualStyleBackColor = true;
+			this.btnSaveTextAs.Click += new System.EventHandler(this.btnSaveTextAs_Click);
+			// 
+			// btnSaveCellsAs
+			// 
+			this.btnSaveCellsAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSaveCellsAs.Location = new System.Drawing.Point(529, 2);
+			this.btnSaveCellsAs.Name = "btnSaveCellsAs";
+			this.btnSaveCellsAs.Size = new System.Drawing.Size(141, 23);
+			this.btnSaveCellsAs.TabIndex = 7;
+			this.btnSaveCellsAs.Text = "Save datagrid cells as...";
+			this.btnSaveCellsAs.UseVisualStyleBackColor = true;
+			this.btnSaveCellsAs.Click += new System.EventHandler(this.btnSaveCellsAs_Click);
+			// 
+			// saveFileDialogSelectedCells
+			// 
+			this.saveFileDialogSelectedCells.DefaultExt = "txt";
+			this.saveFileDialogSelectedCells.Filter = "Text files|*.txt|Html files|*.html|CSV File|*.csv|All Files|*.*";
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(672, 479);
-			this.Controls.Add(this.btnSaveAs);
+			this.Controls.Add(this.btnSaveCellsAs);
+			this.Controls.Add(this.btnSaveTextAs);
 			this.Controls.Add(this.btnVerifyCerts);
 			this.Controls.Add(this.dataGridViewCertificates);
-			this.Controls.Add(this.selectStoreName);
-			this.Controls.Add(this.selectStoreLocation);
 			this.Controls.Add(this.btnEnumerate);
 			this.Controls.Add(this.tbOutput);
 			this.Name = "MainForm";
@@ -144,12 +139,12 @@
 
 		private System.Windows.Forms.TextBox tbOutput;
 		private System.Windows.Forms.Button btnEnumerate;
-		private System.Windows.Forms.ComboBox selectStoreLocation;
-		private System.Windows.Forms.ListBox selectStoreName;
 		private System.Windows.Forms.DataGridView dataGridViewCertificates;
 		private System.Windows.Forms.Button btnVerifyCerts;
-		private System.Windows.Forms.Button btnSaveAs;
-		private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+		private System.Windows.Forms.Button btnSaveTextAs;
+		private System.Windows.Forms.SaveFileDialog saveFileDialogText;
+		private System.Windows.Forms.Button btnSaveCellsAs;
+		private System.Windows.Forms.SaveFileDialog saveFileDialogSelectedCells;
 	}
 }
 
