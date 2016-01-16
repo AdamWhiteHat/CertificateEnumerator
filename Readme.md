@@ -1,6 +1,6 @@
 # CertificateEnumerator
 
-![Screenshot](https://static.wixstatic.com/media/427347_4e9a4f4e2cb247a583fad025628f85b3.png)
+![Screenshot](https://github.com/AdamRakaska/CertificateEnumerator/blob/master/CertificateEnumerator.PNG)
 
 CertificateEnumerator can list every certificate in your various certificate stores for your local machine and currently logged in user. It can then display that information to you either in a DataGridView or TextBox (as columnarized text), and provides the ability to persist that information to file as text, comma separated values (CSV), excel format or HTML table. 
 
