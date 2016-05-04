@@ -9,28 +9,71 @@ namespace CertificateEnumerator
 {
 	public class CertificateRow
 	{
-		public bool PrivateKey { get; set; }
+		public bool Contains(string value)
+		{
+			return 
+			(
+			       FriendlyName.Contains(value)
+				|| Subject.Contains(value)
+				|| Issuer.Contains(value)
+				|| SerialNumber.Contains(value)
+				|| Thumbprint.Contains(value)
+				|| KeyAlgorithm.Contains(value)
+				|| SignatureAlgorithm.Contains(value)
+				|| Version.Contains(value)
+				|| Format.Contains(value)
+				|| Extentions.Contains(value)
+				|| StoreLocation.Contains(value)
+				|| StoreName.Contains(value)
+				|| EffectiveDate.ToString().Contains(value)
+				|| ExpirationDate.ToString().Contains(value)
+			);
+		}
+		
 		public bool IsVerified { get; set; }
+		public DateTime EffectiveDate { get; set; }
+		public DateTime ExpirationDate { get; set; }	
 		public string StoreLocation { get; set; }
 		public string StoreName { get; set; }
 		public string FriendlyName { get; set; }
-		public string SerialNumber { get; set; }
+		public string Subject { get; set; }
+		public string Issuer { get; set; }
+		public string SerialNumber { get; set; }		
 		public string Thumbprint { get; set; }
-		public string Algorithm { get; set; }
-		private X509Certificate2 _cert;
+		public bool HasPrivateKey { get; set; }
+		public string KeyAlgorithm { get; set; }
+		public string SignatureAlgorithm { get; set; }
+		public string Version { get; set; }
+		public string Format { get; set; }
+		public List<string> Extentions { get; set; }
 
-		public CertificateRow(X509Certificate2 certificate)
+		
+		private X509Certificate2 _certificate;
+
+		public CertificateRow(X509Certificate2 cert)
 		{
-			_cert = certificate;
-			Algorithm = _cert.GetKeyAlgorithm();
-			PrivateKey = _cert.HasPrivateKey;
-			SerialNumber = _cert.SerialNumber;
-			Thumbprint = _cert.Thumbprint;
-			FriendlyName = _cert.FriendlyName;
-			if (string.IsNullOrWhiteSpace(FriendlyName))
+			_certificate = cert;
+
+			KeyAlgorithm = _certificate.GetKeyAlgorithm();
+			HasPrivateKey = _certificate.HasPrivateKey;
+			SerialNumber = _certificate.SerialNumber;
+			Thumbprint = _certificate.Thumbprint;
+			FriendlyName = _certificate.FriendlyName;// !string.IsNullOrWhiteSpace(_certificate.FriendlyName)
+				// ? _certificate.FriendlyName
+				// : string.Format("[{0}]\t[{1}]", _certificate.Issuer, _certificate.Subject);
+			Subject = _certificate.Subject;
+			EffectiveDate = _certificate.NotBefore;
+			ExpirationDate = _certificate.NotAfter;
+			Format = _certificate.GetFormat();
+			Issuer = _certificate.Issuer;		
+			SignatureAlgorithm = _certificate.SignatureAlgorithm.FriendlyName;
+			Version = _certificate.Version.ToString();
+
+			Extentions = new List<string>();
+			foreach (X509Extension ext in _certificate.Extensions)
 			{
-				FriendlyName = string.Format("[{0}]\t[{1}]", _cert.Issuer, _cert.Subject);
-			}
+				Extentions.Add(ext.Format(false));
+			}			
 		}
 
 		public static List<CertificateRow> FromStore(X509Store store)
@@ -40,7 +83,7 @@ namespace CertificateEnumerator
 			{
 				CertificateRow newRow = new CertificateRow(cert);
 				newRow.StoreName = store.Name;
-				newRow.StoreLocation = store.Location.ToString();
+				newRow.StoreLocation = store.Location.ToString();				
 				results.Add(newRow);
 			}
 			return results;
@@ -48,9 +91,9 @@ namespace CertificateEnumerator
 
 		public void Verify()
 		{
-			if (_cert != null)
+			if (_certificate != null)
 			{
-				IsVerified = _cert.Verify();
+				IsVerified = _certificate.Verify();
 			}
 		}
 	}

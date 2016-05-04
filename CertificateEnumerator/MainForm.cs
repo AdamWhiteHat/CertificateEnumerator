@@ -12,13 +12,14 @@ using System.Security.Cryptography.X509Certificates;
 
 using ConversionUtilities;
 using CertificateEnumerator;
+using CertificateEnumerator.CertificateExtensionMethods;
 
 namespace CertificateEnumeratorGUI
 {
 	public partial class MainForm : Form
 	{
 		Certificates certEnumerator;
-		List<CertificateEnumerator.CertificateRow> certList = new List<CertificateEnumerator.CertificateRow>();
+		List<CertificateRow> certList = new List<CertificateEnumerator.CertificateRow>();
 
 		public MainForm()
 		{
@@ -26,58 +27,121 @@ namespace CertificateEnumeratorGUI
 			certEnumerator = new Certificates();
 		}
 
-		private void DisplayOutput(string format, params object[] args)
+		#region Form Event Handlers
+
+		private void MainForm_Load(object sender, EventArgs e)
 		{
-			tbOutput.Text += string.Concat(string.Format(format, args), Environment.NewLine);
-		}
-
-		private void DisplayClear()
-		{
-			tbOutput.Text = string.Empty;
-		}
-
-		private void btnEnumerate_Click(object sender, EventArgs e)
-		{
-			DisplayClear();
-
-			certList = certEnumerator.GetCertificateRows();
-			dataGridViewCertificates.DataSource = certList;
-
-			tbOutput.Text = certEnumerator.GetCertificateString();
+			PopulateCells();
 		}
 
 		private void btnVerifyCerts_Click(object sender, EventArgs e)
 		{
-			foreach (CertificateEnumerator.CertificateRow certRow in certList)
-			{
-				certRow.Verify();
-			}
-		}
-
-		private void ShowNothingToSaveMessage()
-		{
-			MessageBox.Show("Nothing to save! Try clicking the 'Enumerate' button first, then 'Save as...'");
-		}
-
-		private void btnSaveTextAs_Click(object sender, EventArgs e)
-		{
-			if (string.IsNullOrWhiteSpace(tbOutput.Text))
-			{
-				ShowNothingToSaveMessage();
-				return;
-			}
-			if (saveFileDialogText.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-			{
-				string filename = saveFileDialogText.FileName;
-				File.WriteAllLines(filename, tbOutput.Lines);
-			}
+			certList.VerifyAllCerts();
+			SetDataSource(certList);
 		}
 
 		private void btnSaveCellsAs_Click(object sender, EventArgs e)
 		{
+			SaveCellsAs();
+		}
+
+		private void btnSearch_Click(object sender, EventArgs e)
+		{
+			Search(tbSearch.Text);			
+		}
+
+		private void tbSearch_KeyUp(object sender, KeyEventArgs e)
+		{
+			if (e.KeyData == Keys.Enter)
+			{
+				Search(tbSearch.Text);
+			}
+		}
+
+		private void dataGridViewCertificates_KeyUp(object sender, KeyEventArgs e)
+		{
+			if (e.Modifiers == Keys.Control)
+			{
+				if (e.KeyData == Keys.S)
+				{
+					SaveCellsAs();
+				}
+			}
+			else if (e.KeyData == Keys.F5)
+			{
+				PopulateCells();
+			}
+		}	
+
+		#endregion
+
+		private void Search(string value)
+		{
+			List<CertificateRow> newCertList = certEnumerator.GetCertificateRows().Where(cr => cr.Contains(value)).ToList();
+			SetDataSource(newCertList);
+		}
+
+		private void PopulateCells()
+		{
+			certList = certEnumerator.GetCertificateRows();
+			SetDataSource(certList);			
+		}
+
+		private void SetDataSource<T>(IEnumerable<T> source)
+		{
+			dataGridViewCertificates.DataSource = null;
+			dataGridViewCertificates.DataSource = source;
+		}
+
+		private void SetDataSource(List<CertificateRow> certificateRow)
+		{
+			certList = certificateRow;
+			SetDataSource<CertificateRow>(certList);
+
+			HighlightExpiredCertificateCells();
+		}
+
+		private void HighlightExpiredCertificateCells()
+		{
+			DataGridViewCell effectiveDateCell;
+			DataGridViewCell expirationDateCell;
+			DateTime effectiveDate;
+			DateTime expirationDate;
+			foreach (DataGridViewRow row in dataGridViewCertificates.Rows)
+			{
+				effectiveDateCell = row.Cells["EffectiveDate"];
+				expirationDateCell = row.Cells["ExpirationDate"];
+				if (effectiveDateCell == null || expirationDateCell == null)
+				{
+					continue;
+				}
+				effectiveDate = (DateTime)effectiveDateCell.Value;
+				expirationDate = (DateTime)expirationDateCell.Value;
+				if (effectiveDate == null || expirationDate == null)
+				{
+					continue;
+				}
+
+				if (DateTime.Now.CompareTo(effectiveDate) < 0)
+				{
+					effectiveDateCell.Style.Font = new System.Drawing.Font("arial", 9, FontStyle.Bold);
+					row.DefaultCellStyle.BackColor = Color.MistyRose;
+				}
+				if (DateTime.Now.CompareTo(expirationDate) > 0)
+				{
+					expirationDateCell.Style.Font = new System.Drawing.Font("arial", 9, FontStyle.Bold);
+					row.DefaultCellStyle.BackColor = Color.MistyRose;
+				}
+			}
+		}
+
+		#region Save As Methods
+
+		private void SaveCellsAs()
+		{
 			if (dataGridViewCertificates.DataSource == null || dataGridViewCertificates.RowCount < 1)
 			{
-				ShowNothingToSaveMessage();
+				MessageBox.Show("Nothing to save! Try hitting F5 to refresh.");
 				return;
 			}
 			if (saveFileDialogSelectedCells.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -107,19 +171,19 @@ namespace CertificateEnumeratorGUI
 						SaveCells_AsTEXT(filename);
 						break;
 				}
-			}						
+			}
 		}
 
 		private void SaveCells_AsTEXT(string filename)
 		{
-			string clipBoard = PasteClipboard(TextDataFormat.Text);
-			File.WriteAllText(filename, clipBoard);			
+			string clipBoard = certEnumerator.GetCertificateString(); //PasteClipboard(TextDataFormat.Text);
+			File.WriteAllText(filename, clipBoard);
 		}
 
 		private void SaveCells_AsCSV(string filename)
 		{
 			string clipBoard = PasteClipboard(TextDataFormat.CommaSeparatedValue);
-			File.WriteAllText(filename, clipBoard);	
+			File.WriteAllText(filename, clipBoard);
 		}
 
 		private void SaveCells_AsHTML(string filename)
@@ -129,7 +193,7 @@ namespace CertificateEnumeratorGUI
 			int start = clipBoard.IndexOf("<HTML>");
 			clipBoard = clipBoard.Substring(start);
 
-			File.WriteAllText(filename, clipBoard);	
+			File.WriteAllText(filename, clipBoard);
 		}
 
 		private void SaveCells_AsXLSX(string filename)
@@ -151,8 +215,6 @@ namespace CertificateEnumeratorGUI
 		{
 			// Choose whether to write header. You will want to do this for a CSV file.
 			dataGridViewCertificates.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-			// Save the current state of the clipboard so we can restore it after we are done
-			IDataObject objectSave = Clipboard.GetDataObject();
 			// Select the cells we want to serialize.
 			dataGridViewCertificates.SelectAll();
 			// Copy (set clipboard)
@@ -169,5 +231,8 @@ namespace CertificateEnumeratorGUI
 			}
 			return result;
 		}
+
+		#endregion
+
 	}
 }
