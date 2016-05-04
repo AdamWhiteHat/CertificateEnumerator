@@ -19,7 +19,7 @@ namespace CertificateEnumeratorGUI
 	public partial class MainForm : Form
 	{
 		Certificates certEnumerator;
-		List<CertificateRow> certList = new List<CertificateEnumerator.CertificateRow>();
+		List<CertificateRow> certList = new List<CertificateRow>();
 
 		public MainForm()
 		{
@@ -124,13 +124,13 @@ namespace CertificateEnumeratorGUI
 
 				if (DateTime.Now.CompareTo(effectiveDate) < 0)
 				{
-					effectiveDateCell.Style.Font = new System.Drawing.Font("arial", 9, FontStyle.Bold);
 					row.DefaultCellStyle.BackColor = Color.MistyRose;
+					effectiveDateCell.ErrorText = "Effective date not reached.";
 				}
 				if (DateTime.Now.CompareTo(expirationDate) > 0)
 				{
-					expirationDateCell.Style.Font = new System.Drawing.Font("arial", 9, FontStyle.Bold);
 					row.DefaultCellStyle.BackColor = Color.MistyRose;
+					expirationDateCell.ErrorText = "ExpirationDate date passed.";					
 				}
 			}
 		}
@@ -176,7 +176,7 @@ namespace CertificateEnumeratorGUI
 
 		private void SaveCells_AsTEXT(string filename)
 		{
-			string clipBoard = certEnumerator.GetCertificateString(); //PasteClipboard(TextDataFormat.Text);
+			string clipBoard = PasteClipboard(TextDataFormat.Text);
 			File.WriteAllText(filename, clipBoard);
 		}
 

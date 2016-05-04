@@ -29,23 +29,23 @@ namespace CertificateEnumerator
 				|| ExpirationDate.ToString().Contains(value)
 			);
 		}
-		
-		public bool IsVerified { get; set; }
-		public DateTime EffectiveDate { get; set; }
-		public DateTime ExpirationDate { get; set; }	
-		public string StoreLocation { get; set; }
-		public string StoreName { get; set; }
-		public string FriendlyName { get; set; }
-		public string Subject { get; set; }
-		public string Issuer { get; set; }
-		public string SerialNumber { get; set; }		
-		public string Thumbprint { get; set; }
-		public bool HasPrivateKey { get; set; }
-		public string KeyAlgorithm { get; set; }
-		public string SignatureAlgorithm { get; set; }
-		public string Version { get; set; }
-		public string Format { get; set; }
-		public List<string> Extentions { get; set; }
+
+		public bool IsVerified { get; private set; }
+		public DateTime EffectiveDate { get; private set; }
+		public DateTime ExpirationDate { get; private set; }	
+		public string StoreLocation { get; internal set; }
+		public string StoreName { get; internal set; }
+		public string FriendlyName { get; private set; }
+		public string Subject { get; private set; }
+		public string Issuer { get; private set; }
+		public string SerialNumber { get; private set; }
+		public string Thumbprint { get; private set; }
+		public bool HasPrivateKey { get; private set; }
+		public string KeyAlgorithm { get; private set; }
+		public string SignatureAlgorithm { get; private set; }
+		public string Version { get; private set; }
+		public string Format { get; private set; }
+		public List<string> Extentions { get; private set; }
 
 		
 		private X509Certificate2 _certificate;
