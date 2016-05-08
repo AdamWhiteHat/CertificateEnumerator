@@ -9,27 +9,6 @@ namespace CertificateEnumerator
 {
 	public class CertificateRow
 	{
-		public bool Contains(string value)
-		{
-			return 
-			(
-			       FriendlyName.Contains(value)
-				|| Subject.Contains(value)
-				|| Issuer.Contains(value)
-				|| SerialNumber.Contains(value)
-				|| Thumbprint.Contains(value)
-				|| KeyAlgorithm.Contains(value)
-				|| SignatureAlgorithm.Contains(value)
-				|| Version.Contains(value)
-				|| Format.Contains(value)
-				|| Extentions.Contains(value)
-				|| StoreLocation.Contains(value)
-				|| StoreName.Contains(value)
-				|| EffectiveDate.ToString().Contains(value)
-				|| ExpirationDate.ToString().Contains(value)
-			);
-		}
-
 		public bool IsVerified { get; private set; }
 		public DateTime EffectiveDate { get; private set; }
 		public DateTime ExpirationDate { get; private set; }	
@@ -46,8 +25,7 @@ namespace CertificateEnumerator
 		public string Version { get; private set; }
 		public string Format { get; private set; }
 		public List<string> Extentions { get; private set; }
-
-		
+				
 		private X509Certificate2 _certificate;
 
 		public CertificateRow(X509Certificate2 cert)
@@ -95,6 +73,27 @@ namespace CertificateEnumerator
 			{
 				IsVerified = _certificate.Verify();
 			}
+		}
+
+		public bool Contains(string value)
+		{
+			return
+			(
+				   FriendlyName.Contains(value)
+				|| Subject.Contains(value)
+				|| Issuer.Contains(value)
+				|| SerialNumber.Contains(value)
+				|| Thumbprint.Contains(value)
+				|| KeyAlgorithm.Contains(value)
+				|| SignatureAlgorithm.Contains(value)
+				|| Version.Contains(value)
+				|| Format.Contains(value)
+				|| Extentions.Contains(value)
+				|| StoreLocation.Contains(value)
+				|| StoreName.Contains(value)
+				|| EffectiveDate.ToString().Contains(value)
+				|| ExpirationDate.ToString().Contains(value)
+			);
 		}
 	}
 }
