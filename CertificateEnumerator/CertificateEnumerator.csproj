@@ -47,10 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CertificateEnumerator.cs" />
+    <Compile Include="Certificate.cs" />
+    <Compile Include="CertificateRowCollection.cs" />
     <Compile Include="CertificateRow.cs" />
     <Compile Include="ExcelConverter.cs" />
-    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -12,19 +12,18 @@ using System.Security.Cryptography.X509Certificates;
 
 using ConversionUtilities;
 using CertificateEnumerator;
-using CertificateEnumerator.CertificateExtensionMethods;
 
 namespace CertificateEnumeratorGUI
 {
 	public partial class MainForm : Form
 	{
-		Certificates certEnumerator;
-		List<CertificateRow> certList = new List<CertificateRow>();
+		CertificateRowCollection certificateRowCollection;
+		//List<CertificateRow> certList = new List<CertificateRow>();
 
 		public MainForm()
 		{
 			InitializeComponent();
-			certEnumerator = new Certificates();
+			
 		}
 
 		#region Form Event Handlers
@@ -32,12 +31,6 @@ namespace CertificateEnumeratorGUI
 		private void MainForm_Load(object sender, EventArgs e)
 		{
 			PopulateCells();
-		}
-
-		private void btnVerifyCerts_Click(object sender, EventArgs e)
-		{
-			certList.VerifyAllCerts();
-			SetDataSource(certList);
 		}
 
 		private void btnSaveCellsAs_Click(object sender, EventArgs e)
@@ -77,60 +70,41 @@ namespace CertificateEnumeratorGUI
 
 		private void Search(string value)
 		{
-			List<CertificateRow> newCertList = certEnumerator.GetCertificateRows().Where(cr => cr.Contains(value)).ToList();
+			List<CertificateRow> newCertList = certificateRowCollection.Where(cr => cr.Contains(value)).ToList();
 			SetDataSource(newCertList);
 		}
 
 		private void PopulateCells()
 		{
-			certList = certEnumerator.GetCertificateRows();
-			SetDataSource(certList);			
-		}
-
-		private void SetDataSource<T>(IEnumerable<T> source)
-		{
-			dataGridViewCertificates.DataSource = null;
-			dataGridViewCertificates.DataSource = source;
+			certificateRowCollection = new CertificateRowCollection();
+			SetDataSource(certificateRowCollection);			
 		}
 
 		private void SetDataSource(List<CertificateRow> certificateRow)
 		{
-			certList = certificateRow;
-			SetDataSource<CertificateRow>(certList);
-
+			dataGridViewCertificates.DataSource = null;
+			dataGridViewCertificates.DataSource = certificateRow;
+			dataGridViewCertificates.Columns["HasErrors"].Visible = false;
+			dataGridViewCertificates.Columns["ErrorText"].Visible = false;
+			dataGridViewCertificates.Columns["ErrorProperty"].Visible = false;
 			HighlightExpiredCertificateCells();
 		}
 
 		private void HighlightExpiredCertificateCells()
 		{
-			DataGridViewCell effectiveDateCell;
-			DataGridViewCell expirationDateCell;
-			DateTime effectiveDate;
-			DateTime expirationDate;
+			certificateRowCollection.VerifyAllCerts();
+
 			foreach (DataGridViewRow row in dataGridViewCertificates.Rows)
 			{
-				effectiveDateCell = row.Cells["EffectiveDate"];
-				expirationDateCell = row.Cells["ExpirationDate"];
-				if (effectiveDateCell == null || expirationDateCell == null)
-				{
-					continue;
-				}
-				effectiveDate = (DateTime)effectiveDateCell.Value;
-				expirationDate = (DateTime)expirationDateCell.Value;
-				if (effectiveDate == null || expirationDate == null)
-				{
-					continue;
-				}
-
-				if (DateTime.Now.CompareTo(effectiveDate) < 0)
+				CertificateRow certRow = (CertificateRow)row.DataBoundItem;
+				if (certRow.HasErrors)
 				{
 					row.DefaultCellStyle.BackColor = Color.MistyRose;
-					effectiveDateCell.ErrorText = "Effective date not reached.";
-				}
-				if (DateTime.Now.CompareTo(expirationDate) > 0)
-				{
-					row.DefaultCellStyle.BackColor = Color.MistyRose;
-					expirationDateCell.ErrorText = "ExpirationDate date passed.";					
+					DataGridViewCell cell = row.Cells[certRow.ErrorProperty];
+					if (cell != null)
+					{
+						cell.ErrorText = certRow.ErrorText;
+					}										
 				}
 			}
 		}

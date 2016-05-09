@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 
 namespace CertificateEnumerator
 {
-	public partial class Certificates
+	public partial class CertificateRowCollection : List<CertificateRow>
 	{
 		public static List<StoreLocation> ListOfStoreLocation =
 			new List<StoreLocation>()
@@ -29,14 +29,9 @@ namespace CertificateEnumerator
 				StoreName.TrustedPublisher				
 			};
 
-
-		public List<CertificateRow> GetCertificateRows()
+		public CertificateRowCollection()
+			: base()
 		{
-			List<CertificateRow> result = new List<CertificateRow>();
-
-			result.AddRange(CertificateRow.FromStore(new X509Store(StoreName.Disallowed, StoreLocation.LocalMachine)));
-			result.AddRange(CertificateRow.FromStore(new X509Store(StoreName.Disallowed, StoreLocation.CurrentUser)));
-
 			foreach (StoreLocation location in ListOfStoreLocation)
 			{
 				foreach (StoreName name in ListOfStoreNames)
@@ -44,12 +39,24 @@ namespace CertificateEnumerator
 					X509Store store = new X509Store(name, location);
 					store.Open(OpenFlags.ReadOnly);
 
-					result.AddRange(CertificateRow.FromStore(store));
+					this.AddRange(CertificateRow.FromStore(store));
 
 					store.Close();
 				}
+			}			
+		}
+
+		private bool _verified = false;
+		public void VerifyAllCerts()
+		{
+			if (this.Count > 0 && !_verified)
+			{
+				foreach (CertificateRow certRow in this)
+				{
+					certRow.Validate();
+				}
+				_verified = true;
 			}
-			return result;
 		}
 	}
 }

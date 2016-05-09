@@ -31,7 +31,6 @@
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.dataGridViewCertificates = new System.Windows.Forms.DataGridView();
-			this.btnVerifyCerts = new System.Windows.Forms.Button();
 			this.btnSaveCellsAs = new System.Windows.Forms.Button();
 			this.saveFileDialogSelectedCells = new System.Windows.Forms.SaveFileDialog();
 			this.btnSearch = new System.Windows.Forms.Button();
@@ -76,17 +75,6 @@
 			this.dataGridViewCertificates.TabIndex = 4;
 			this.dataGridViewCertificates.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dataGridViewCertificates_KeyUp);
 			// 
-			// btnVerifyCerts
-			// 
-			this.btnVerifyCerts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnVerifyCerts.Location = new System.Drawing.Point(682, 2);
-			this.btnVerifyCerts.Name = "btnVerifyCerts";
-			this.btnVerifyCerts.Size = new System.Drawing.Size(75, 23);
-			this.btnVerifyCerts.TabIndex = 5;
-			this.btnVerifyCerts.Text = "Verify Certs";
-			this.btnVerifyCerts.UseVisualStyleBackColor = true;
-			this.btnVerifyCerts.Click += new System.EventHandler(this.btnVerifyCerts_Click);
-			// 
 			// btnSaveCellsAs
 			// 
 			this.btnSaveCellsAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -130,7 +118,6 @@
 			this.Controls.Add(this.tbSearch);
 			this.Controls.Add(this.btnSearch);
 			this.Controls.Add(this.btnSaveCellsAs);
-			this.Controls.Add(this.btnVerifyCerts);
 			this.Controls.Add(this.dataGridViewCertificates);
 			this.MinimumSize = new System.Drawing.Size(563, 300);
 			this.Name = "MainForm";
@@ -145,7 +132,6 @@
 		#endregion
 
 		private System.Windows.Forms.DataGridView dataGridViewCertificates;
-		private System.Windows.Forms.Button btnVerifyCerts;
 		private System.Windows.Forms.Button btnSaveCellsAs;
 		private System.Windows.Forms.SaveFileDialog saveFileDialogSelectedCells;
 		private System.Windows.Forms.Button btnSearch;
