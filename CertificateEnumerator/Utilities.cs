@@ -80,11 +80,6 @@ namespace CertificateEnumerator
                 }
             }
 
-            if (erroredCRLs != null && erroredCRLs.Count > 0)
-            {
-                int i = 0;
-            }
-
             return successCRLs;
         }
 
