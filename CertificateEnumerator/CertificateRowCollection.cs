@@ -30,7 +30,7 @@ namespace CertificateEnumerator
                 StoreName.TrustedPublisher
             };
 
-        public static CertificateRowCollection FromFolder(List<X509Certificate2> store)
+        public static CertificateRowCollection FromList(List<X509Certificate2> store)
         {
             List<CertificateRow> results = new List<CertificateRow>();
             foreach (X509Certificate2 cert in store)

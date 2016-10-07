@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -9,10 +10,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-
-using ConversionUtilities;
 using CertificateEnumerator;
-using System.Net;
 
 namespace CertificateEnumeratorGUI
 {
@@ -93,7 +91,7 @@ namespace CertificateEnumeratorGUI
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 List<X509Certificate2> certs = Utilities.CertsFromFolder(dlg.SelectedPath);
-                CertificateRowCollection certRowCollection = CertificateRowCollection.FromFolder(certs);
+                CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
                 List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeys();
 
                 string filename = Utilities.EnsureFilenameNotExists(publicKeysFolderOutputFilename);
