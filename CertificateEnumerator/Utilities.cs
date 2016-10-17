@@ -48,7 +48,7 @@ namespace CertificateEnumerator
             List<string> successCRLs = new List<string>();
             List<string> erroredCRLs = new List<string>();
 
-            using (var client = new WebClientWithTimeout(webRequestTimeout))
+            using (WebClientWithTimeout client = new WebClientWithTimeout(webRequestTimeout))
             {                               
                 foreach (string remoteFile in remoteFileURIs)
                 {

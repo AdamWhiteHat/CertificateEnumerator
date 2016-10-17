@@ -87,15 +87,17 @@ namespace CertificateEnumeratorGUI
 
         private void btnSearchFolder_Click(object sender, EventArgs e)
         {
-            FolderBrowserDialog dlg = new FolderBrowserDialog();
-            if (dlg.ShowDialog() == DialogResult.OK)
+            using (FolderBrowserDialog dlg = new FolderBrowserDialog())
             {
-                List<X509Certificate2> certs = Utilities.CertsFromFolder(dlg.SelectedPath);
-                CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
-                List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeys();
-
-                string filename = Utilities.EnsureFilenameNotExists(publicKeysFolderOutputFilename);
-                File.WriteAllLines(filename, publicKeys);
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    List<X509Certificate2> certs = Utilities.CertsFromFolder(dlg.SelectedPath);
+                    CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
+                    List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeys();
+    
+                    string filename = Utilities.EnsureFilenameNotExists(publicKeysFolderOutputFilename);
+                    File.WriteAllLines(filename, publicKeys);
+                }
             }
         }
 
