@@ -27,7 +27,7 @@ namespace CertificateEnumerator
 
         public string GetPublicKey()
         {
-            return new BigInteger(certificate.GetPublicKey()).ToString();
+            return Utilities.CalculateValue(certificate.GetPublicKey()).ToString();
         }
                
         public List<string> GetCertificateRevocationListURLs()

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Numerics;
 
 namespace CertificateEnumerator
 {
@@ -115,6 +116,26 @@ namespace CertificateEnumerator
             {
                 return false;
             }
+        }
+
+        private static BigInteger ByteMax = new BigInteger(256);
+
+        internal static BigInteger CalculateValue(byte[] input)
+        {
+            byte[] localCopy = new List<byte>(input).ToArray();
+            Array.Reverse(localCopy);
+
+            int counter = 0;
+            BigInteger placeValue = new BigInteger(0);
+            BigInteger result = new BigInteger(0);
+            foreach (byte octet in localCopy)
+            {
+                placeValue = BigInteger.Pow(ByteMax, counter);
+                placeValue *= octet;
+                result += placeValue;
+                counter++;
+            }
+            return result;
         }
     }
 }
