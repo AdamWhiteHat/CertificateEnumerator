@@ -67,7 +67,7 @@ namespace CertificateEnumerator
 
         public List<string> GetAllCertificatesRevocationListURLs()
         {
-            return this.SelectMany(crt => crt.GetCertificateRevocationListURLs()).ToList();
+            return this.SelectMany(crt => crt.GetCertificateRevocationListURLs()).Distinct().ToList();
         }
 
         public List<string> DownloadAllCertificatesRevocationListURLs()
@@ -88,7 +88,7 @@ namespace CertificateEnumerator
                     continue;
                 }
 
-                if (Utilities.InstallCertificate(file))
+                if (Utilities.InstallCertificateRevocationList(file))
                 {
                     installedCRLs.Add(file);
                 }

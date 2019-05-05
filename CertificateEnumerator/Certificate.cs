@@ -26,7 +26,7 @@ namespace CertificateEnumerator
         public string Format { get; private set; }
         public List<string> Extentions { get; private set; }
 
-        internal X509Certificate2 certificate;
+        protected X509Certificate2 certificate;
 
         public Certificate(X509Certificate2 cert)
         {

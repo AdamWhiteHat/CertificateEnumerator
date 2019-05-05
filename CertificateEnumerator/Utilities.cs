@@ -11,131 +11,149 @@ using System.Numerics;
 
 namespace CertificateEnumerator
 {
-    public static class Utilities
-    {
-        public static string EnsureFilenameNotExists(string filename)
-        {
-            int counter = 1;
-            string result = filename;
-            string extension = Path.GetExtension(result);
-            while(File.Exists(result))
-            {
-                result = Path.ChangeExtension(result, string.Concat(".", counter.ToString().PadLeft(3,'0'), extension));
-                counter++;
-            }
+	public static class Utilities
+	{
+		public static string EnsureFilenameNotExists(string filename)
+		{
+			int counter = 1;
+			string result = filename;
+			string extension = Path.GetExtension(result);
+			while (File.Exists(result))
+			{
+				result = Path.ChangeExtension(result, string.Concat(".", counter.ToString().PadLeft(3, '0'), extension));
+				counter++;
+			}
 
-            return result;
-        }
+			return result;
+		}
 
-        public static List<X509Certificate2> CertsFromFolder(string path)
-        {
-            if(string.IsNullOrWhiteSpace(path)) { throw new ArgumentException("Argument path must not be null, empty or whitespace", "path"); }
-            if (!Directory.Exists(path)) { throw new DirectoryNotFoundException("Path must exist: " + path); }
-            
-            IEnumerable<string> filePaths = Directory.EnumerateFiles(path, "*.cer", SearchOption.TopDirectoryOnly);
+		public static List<X509Certificate2> CertsFromFolder(string path)
+		{
+			if (string.IsNullOrWhiteSpace(path)) { throw new ArgumentException("Argument path must not be null, empty or whitespace", "path"); }
+			if (!Directory.Exists(path)) { throw new DirectoryNotFoundException("Path must exist: " + path); }
 
-            List<X509Certificate2> results = new List<X509Certificate2>();
-            foreach (string file in filePaths)
-            {
-                X509Certificate2 cert = new X509Certificate2(file);                
-                results.Add(cert);
-            }
-            return results;
-        }
+			IEnumerable<string> filePaths = Directory.EnumerateFiles(path, "*.cer", SearchOption.TopDirectoryOnly);
 
-        private static int webRequestTimeout = 2000;
-        public static List<string> DownloadFiles(List<string> remoteFileURIs)
-        {
-            List<string> successCRLs = new List<string>();
-            List<string> erroredCRLs = new List<string>();
+			List<X509Certificate2> results = new List<X509Certificate2>();
+			foreach (string file in filePaths)
+			{
+				X509Certificate2 cert = new X509Certificate2(file);
+				results.Add(cert);
+			}
+			return results;
+		}
+		
+		private static int webRequestTimeout = 2000;
+		public static string DownloadPath = @"C:\Temp\Certificates\Downloads"; //Path.GetFullPath("Downloads"); // Path.GetTempPath() 
+		public static List<string> DownloadFiles(List<string> remoteFileURIs)
+		{
+			List<string> successCRLs = new List<string>();
+			List<Tuple<string, string>> erroredCRLs = new List<Tuple<string, string>>();
 
-            using (WebClientWithTimeout client = new WebClientWithTimeout(webRequestTimeout))
-            {                               
-                foreach (string remoteFile in remoteFileURIs)
-                {
-                    string localFile = string.Empty;
-                    try
-                    {
-                        Uri uri = new Uri(remoteFile);
-                        if (uri == null) { continue; }
-                        string filename = uri.LocalPath.TrimStart('/', '\\');
-                        if (string.IsNullOrWhiteSpace(filename)) { continue; }
-                        localFile = Path.Combine(Path.GetTempPath(), filename);
+			if (!Directory.Exists(DownloadPath))
+			{
+				Directory.CreateDirectory(DownloadPath);
+			}
 
-                        // TODO: Make asynch                        
-                        client.DownloadFile(remoteFile, localFile);
+			using (WebClientWithTimeout client = new WebClientWithTimeout(webRequestTimeout))
+			{
+				foreach (string remoteFile in remoteFileURIs)
+				{
+					string localFile = string.Empty;
+					try
+					{
+						Uri uri = new Uri(remoteFile);
+						if (uri == null) { continue; }
+						string filename = uri.LocalPath.TrimStart('/', '\\');
+						if (string.IsNullOrWhiteSpace(filename)) { continue; }
+						localFile = Path.Combine(DownloadPath, filename);
 
-                        if (File.Exists(localFile))
-                        {
-                            successCRLs.Add(localFile);
-                        }
-                        else
-                        {
-                            erroredCRLs.Add(localFile);
-                        }
-                    }
-                    catch (WebException)
-                    {
-                        erroredCRLs.Add(localFile);
-                    }
-                }
-            }
+						// TODO: Make async                      
+						client.DownloadFile(remoteFile, localFile);
 
-            return successCRLs;
-        }
+						if (File.Exists(localFile))
+						{
+							successCRLs.Add(localFile);
+						}
+						else
+						{
+							erroredCRLs.Add(new Tuple<string, string>(remoteFile, localFile));
+						}
+					}
+					catch (WebException)
+					{
+						erroredCRLs.Add(new Tuple<string, string>(remoteFile, localFile));
+					}
+				}
+			}
 
-        public static bool InstallCertificate(string certificateFileName)
-        {
-            if (!File.Exists(certificateFileName))
-            {
-                return false;
-            }
+			if (erroredCRLs.Any())
+			{
+				string errorFile = Path.Combine(DownloadPath, "CRLDownloadFailures.txt");
+				File.WriteAllLines(errorFile, erroredCRLs.Select(tup => $"{{\n\tURL: \"{tup.Item1}\"\n\tPATH: \"{tup.Item2}\"\n}}"));
+			}
 
-            try
-            {
-                bool result = false;
-                X509Store store = new X509Store(StoreName.Disallowed, StoreLocation.LocalMachine);
-                X509Certificate2 certificate = new X509Certificate2(certificateFileName);
-                store.Open(OpenFlags.ReadWrite);
-                bool certificateExists = store.Certificates.Contains(certificate);
+			return successCRLs;
+		}
 
-                if (certificateExists)
-                {
-                    result = true;
-                }
-                else
-                {
-                    //store.Add(certificate);                    
-                    result = true;
-                }
-                store.Close();
-                store = null;
-                return result;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+		public static bool InstallCertificateRevocationList(string crlFilepath)
+		{
+			if (!File.Exists(crlFilepath))
+			{
+				return false;
+			}
 
-        private static BigInteger ByteMax = new BigInteger(256);
+			try
+			{
+				bool result = false;
+				X509Store store = new X509Store(StoreName.Disallowed, StoreLocation.LocalMachine);				
+				store.Open(OpenFlags.ReadWrite);
 
-        internal static BigInteger CalculateValue(byte[] input)
-        {
-            byte[] localCopy = new List<byte>(input).ToArray();
-            Array.Reverse(localCopy);
+				X509Certificate2 certificate = new X509Certificate2(crlFilepath);
+					//new X509Certificate2();
+				//byte[] fileBytes = File.ReadAllBytes(crlFilepath);
+				//certificate.Import(fileBytes);
 
-            int counter = 0;
-            BigInteger placeValue = new BigInteger(0);
-            BigInteger result = new BigInteger(0);
-            foreach (byte octet in localCopy)
-            {
-                placeValue = BigInteger.Pow(ByteMax, counter);
-                placeValue *= octet;
-                result += placeValue;
-                counter++;
-            }
-            return result;
-        }
-    }
+				bool certificateExists = store.Certificates.Contains(certificate);
+
+				if (certificateExists)
+				{
+					result = true;
+				}
+				else
+				{
+					//store.Add(certificate);
+					result = true;
+				}
+				store.Close();
+				store = null;
+				return result;
+			}
+			catch (Exception ex)
+			{
+				string message = ex.ToString();
+				return false;
+			}
+		}
+
+		private static BigInteger ByteMax = new BigInteger(256);
+
+		internal static BigInteger CalculateValue(byte[] input)
+		{
+			byte[] localCopy = new List<byte>(input).ToArray();
+			Array.Reverse(localCopy);
+
+			int counter = 0;
+			BigInteger placeValue = new BigInteger(0);
+			BigInteger result = new BigInteger(0);
+			foreach (byte octet in localCopy)
+			{
+				placeValue = BigInteger.Pow(ByteMax, counter);
+				placeValue *= octet;
+				result += placeValue;
+				counter++;
+			}
+			return result;
+		}
+	}
 }

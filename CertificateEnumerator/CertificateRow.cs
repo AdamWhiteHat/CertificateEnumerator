@@ -59,8 +59,24 @@ namespace CertificateEnumerator
         {
             if (!HasErrors)
             {
-                // Validate not in Untrusted store
-                if (this.StoreName == "Disallowed")
+				// Validate not in Untrusted store
+				bool disallowed = false;
+
+				disallowed = (this.StoreName == "Disallowed");
+
+				if (!disallowed)
+				{
+					X509Store machineStore = new X509Store(System.Security.Cryptography.X509Certificates.StoreName.Disallowed, System.Security.Cryptography.X509Certificates.StoreLocation.LocalMachine);
+					X509Store userStore = new X509Store(System.Security.Cryptography.X509Certificates.StoreName.Disallowed, System.Security.Cryptography.X509Certificates.StoreLocation.CurrentUser);
+
+					disallowed |= machineStore.Certificates.Contains(this.certificate);
+					disallowed |= userStore.Certificates.Contains(this.certificate);
+
+					machineStore.Close();
+					userStore.Close();
+				}
+
+                if (disallowed)
                 {
                     ErrorText = "Certificate in Untrusted store.";
                     ErrorProperty = "StoreName";
@@ -90,5 +106,23 @@ namespace CertificateEnumerator
                 }
             }
         }
-    }
+
+		static bool StoreContainsCertificate(StoreName storeName, StoreLocation storeLocation, X509Certificate2 certificate)
+		{
+			X509Store store = new X509Store(storeName, storeLocation);
+			X509Certificate2Collection certificates = null;
+			try
+			{
+				store.Open(OpenFlags.ReadOnly);
+
+				certificates = store.Certificates.Find(X509FindType.FindByThumbprint, certificate.GetCertHash(), false);
+				return certificates.Count > 0;
+			}
+			finally
+			{
+				//SecurityUtils.ResetAllCertificates(certificates);
+				store.Close();				
+			}
+		}
+	}
 }
