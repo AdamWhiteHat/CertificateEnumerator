@@ -14,6 +14,16 @@ namespace CertificateEnumerator
 {
 	public static class Utilities
 	{
+		public static string ToDownloadFilename = "CRLs_ToDownload.txt";
+		public static string FailedDownloadsFilename = "CRLs_FailedDownloads.txt";
+		public static string SuccessfullyInstalledFilename = "CRLs_SuccessfullyInstalled.txt";
+
+		public static string DownloadPath = @"C:\Temp\Certificates\Downloads"; //Path.GetFullPath("Downloads"); // Path.GetTempPath() 
+		public static string CertUtilExecutable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "CertUtil.exe");
+
+		private static BigInteger ByteMax = new BigInteger(256);
+		private static int webRequestTimeout = 2000;
+
 		public static string EnsureFilenameNotExists(string filename)
 		{
 			int counter = 1;
@@ -24,7 +34,6 @@ namespace CertificateEnumerator
 				result = Path.ChangeExtension(result, string.Concat(".", counter.ToString().PadLeft(3, '0'), extension));
 				counter++;
 			}
-
 			return result;
 		}
 
@@ -44,8 +53,6 @@ namespace CertificateEnumerator
 			return results;
 		}
 
-		private static int webRequestTimeout = 2000;
-		public static string DownloadPath = @"C:\Temp\Certificates\Downloads"; //Path.GetFullPath("Downloads"); // Path.GetTempPath() 
 		public static List<string> DownloadFiles(List<string> remoteFileURIs)
 		{
 			List<string> successCRLs = new List<string>();
@@ -97,7 +104,7 @@ namespace CertificateEnumerator
 
 			if (erroredCRLs.Any())
 			{
-				string errorFile = Path.Combine(DownloadPath, "CRLDownloadFailures.txt");
+				string errorFile = Path.Combine(Utilities.DownloadPath, Utilities.FailedDownloadsFilename);
 				File.WriteAllLines(errorFile, erroredCRLs.Select(tup => $"{{\n\tURL: \"{tup.Item1}\"\n\tPATH: \"{tup.Item2}\"\n}}"));
 			}
 
@@ -140,9 +147,6 @@ namespace CertificateEnumerator
 			}
 			return result;
 		}
-
-		private static string CertUtilExecutable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "CertUtil.exe");
-		private static BigInteger ByteMax = new BigInteger(256);
 
 		internal static BigInteger CalculateValue(byte[] input)
 		{
