@@ -86,24 +86,7 @@ namespace CertificateEnumeratorGUI
 
 			File.WriteAllLines(Path.Combine(Utilities.DownloadPath, "InstalledCerts.txt"), installedCRLs);
 		}
-
-
-		private void btnTest_Click(object sender, EventArgs e)
-		{
-			List<string> installedCRLs = new List<string>();
-			List<string> downloadedCRLs = Directory.EnumerateFiles(Utilities.DownloadPath, "*.crl").ToList();
-
-			string toInstall = downloadedCRLs.First();
-			List<string> installList = new List<string>() { toInstall };
-
-			if (installList != null && installList.Count > 0)
-			{
-				installedCRLs = certificateRowCollection.InstallCertificatesRevocationLists(installList);
-			}
-
-			File.WriteAllLines(Path.Combine(Utilities.DownloadPath, "InstalledCerts.txt"), installedCRLs);
-		}
-
+				
 		private void btnSearchFolder_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog dlg = new FolderBrowserDialog())

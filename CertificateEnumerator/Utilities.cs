@@ -2,12 +2,13 @@
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Text;
+using System.Numerics;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using System.Numerics;
+using System.Windows.Forms;
 
 namespace CertificateEnumerator
 {
@@ -42,7 +43,7 @@ namespace CertificateEnumerator
 			}
 			return results;
 		}
-		
+
 		private static int webRequestTimeout = 2000;
 		public static string DownloadPath = @"C:\Temp\Certificates\Downloads"; //Path.GetFullPath("Downloads"); // Path.GetTempPath() 
 		public static List<string> DownloadFiles(List<string> remoteFileURIs)
@@ -65,6 +66,13 @@ namespace CertificateEnumerator
 						Uri uri = new Uri(remoteFile);
 						if (uri == null) { continue; }
 						string filename = uri.LocalPath.TrimStart('/', '\\');
+
+						int index = filename.LastIndexOf('/');
+						if (index != -1)
+						{
+							filename = filename.Substring(index + 1);
+						}
+
 						if (string.IsNullOrWhiteSpace(filename)) { continue; }
 						localFile = Path.Combine(DownloadPath, filename);
 
@@ -98,44 +106,42 @@ namespace CertificateEnumerator
 
 		public static bool InstallCertificateRevocationList(string crlFilepath)
 		{
-			if (!File.Exists(crlFilepath))
+			if (!File.Exists(crlFilepath) || !File.Exists(CertUtilExecutable))
 			{
 				return false;
 			}
 
 			try
 			{
-				bool result = false;
-				X509Store store = new X509Store(StoreName.Disallowed, StoreLocation.LocalMachine);				
-				store.Open(OpenFlags.ReadWrite);
-
-				X509Certificate2 certificate = new X509Certificate2(crlFilepath);
-					//new X509Certificate2();
-				//byte[] fileBytes = File.ReadAllBytes(crlFilepath);
-				//certificate.Import(fileBytes);
-
-				bool certificateExists = store.Certificates.Contains(certificate);
-
-				if (certificateExists)
-				{
-					result = true;
-				}
-				else
-				{
-					//store.Add(certificate);
-					result = true;
-				}
-				store.Close();
-				store = null;
+				bool result = ExecuteCommandLine(CertUtilExecutable, $"-addstore -f Disallowed \"{crlFilepath}\"");
 				return result;
 			}
 			catch (Exception ex)
 			{
+				string exceptionType = ex.GetType().ToString();
 				string message = ex.ToString();
+				MessageBox.Show(message, exceptionType, MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 		}
 
+		public static bool ExecuteCommandLine(string executablePath, string arguments)
+		{
+			bool result = false;
+			using (Process process = new Process())
+			{
+				process.StartInfo = new ProcessStartInfo(executablePath, arguments)
+				{
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
+				result = process.Start();
+				process.WaitForExit();
+				process.Close();
+			}
+			return result;
+		}
+
+		private static string CertUtilExecutable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "CertUtil.exe");
 		private static BigInteger ByteMax = new BigInteger(256);
 
 		internal static BigInteger CalculateValue(byte[] input)
