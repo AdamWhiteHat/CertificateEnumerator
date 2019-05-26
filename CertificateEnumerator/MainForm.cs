@@ -1,24 +1,20 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Drawing;
+using System.Collections;
 using System.Windows.Forms;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using CertificateEnumerator;
 
 namespace CertificateEnumeratorGUI
 {
 	public partial class MainForm : Form
 	{
 		private CertificateRowCollection certificateRowCollection;
-		private string publicKeysStoreOutputFilename = "PublicKeys.Store.Output.txt";
-		private string publicKeysFolderOutputFilename = "PublicKeys.Folder.Output.txt";
 
 		public MainForm()
 		{
@@ -40,6 +36,16 @@ namespace CertificateEnumeratorGUI
 		private void btnSearch_Click(object sender, EventArgs e)
 		{
 			Search(tbSearch.Text);
+		}
+
+		private void btnDownloadCRLs_Click(object sender, EventArgs e)
+		{
+			DownloadCRLs();
+		}
+
+		private void btnInstallCRLs_Click(object sender, EventArgs e)
+		{
+			InstallCRLs();
 		}
 
 		private void tbSearch_KeyUp(object sender, KeyEventArgs e)
@@ -69,19 +75,8 @@ namespace CertificateEnumeratorGUI
 		{
 			List<string> publicKeys = certificateRowCollection.GetAllCertificatesPublicKeys();
 
-			string filename = Utilities.EnsureFilenameNotExists(publicKeysStoreOutputFilename);
+			string filename = Utilities.EnsureFilenameNotExists(Utilities.PublicKeysStoreOutputFilename);
 			File.WriteAllLines(filename, publicKeys);
-		}
-
-		private void btnCertRevocationLists_Click(object sender, EventArgs e)
-		{
-			List<string> downloadedCRLs = certificateRowCollection.DownloadAllCertificatesRevocationListURLs();
-
-			List<string> toInstallCRLs = Directory.EnumerateFiles(Utilities.DownloadPath, "*.crl").ToList();
-
-			List<string> installedCRLs = certificateRowCollection.InstallCertificatesRevocationLists(toInstallCRLs);
-
-			File.WriteAllLines(Path.Combine(Utilities.DownloadPath, Utilities.SuccessfullyInstalledFilename), installedCRLs);
 		}
 
 		private void btnSearchFolder_Click(object sender, EventArgs e)
@@ -90,17 +85,46 @@ namespace CertificateEnumeratorGUI
 			{
 				if (dlg.ShowDialog() == DialogResult.OK)
 				{
-					List<X509Certificate2> certs = Utilities.CertsFromFolder(dlg.SelectedPath);
+					List<X509Certificate2> certs = Utilities.SearchForCertsInFolder(dlg.SelectedPath);
 					CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
 					List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeys();
 
-					string filename = Utilities.EnsureFilenameNotExists(publicKeysFolderOutputFilename);
+					string filename = Utilities.EnsureFilenameNotExists(Utilities.PublicKeysFolderOutputFilename);
 					File.WriteAllLines(filename, publicKeys);
 				}
 			}
 		}
 
+		private void dataGridViewCertificates_Sorted(object sender, EventArgs e)
+		{
+			HighlightExpiredCertificateCells();
+		}
+
 		#endregion
+
+		#region Feature Methods
+
+		private void DownloadCRLs()
+		{
+			List<string> userSpecifiedCRLs = Utilities.GetCRLsToDownloadURLs();
+			if (userSpecifiedCRLs.Any())
+			{
+				List<Tuple<string, string>> successfullyDownloadedCRLs2 = Utilities.DownloadFiles(userSpecifiedCRLs);
+			}
+
+			List<string> certStoreCRLs = certificateRowCollection.GetAllCertificatesRevocationListURLs();
+			if (certStoreCRLs.Any())
+			{
+				// Tuple<string, string> of the form: <RemoteFile, LocalFile>
+				List<Tuple<string, string>> successfullyDownloadedCRLs = Utilities.DownloadFiles(certStoreCRLs);
+			}
+		}
+
+		private void InstallCRLs()
+		{
+			List<string> toInstallCRLs = Directory.EnumerateFiles(Utilities.DownloadPath, "*.crl").ToList();
+			List<string> installedCRLs = Utilities.InstallCertificateRevocationLists(toInstallCRLs);
+		}
 
 		private void Search(string value)
 		{
@@ -116,11 +140,20 @@ namespace CertificateEnumeratorGUI
 
 		private void SetDataSource(List<CertificateRow> certificateRow)
 		{
+			SortableBindingList<CertificateRow> boundList = new SortableBindingList<CertificateRow>(certificateRow);
+			boundList.AllowEdit = false;
+			boundList.AllowNew = false;
+			boundList.AllowRemove = false;
+
 			dataGridViewCertificates.DataSource = null;
-			dataGridViewCertificates.DataSource = certificateRow;
+			dataGridViewCertificates.DataSource = boundList;
 			dataGridViewCertificates.Columns["HasErrors"].Visible = false;
 			dataGridViewCertificates.Columns["ErrorText"].Visible = false;
 			dataGridViewCertificates.Columns["ErrorProperty"].Visible = false;
+
+			dataGridViewCertificates.Columns["IsVerified"].SortMode = DataGridViewColumnSortMode.Automatic;
+			dataGridViewCertificates.Columns["HasPrivateKey"].SortMode = DataGridViewColumnSortMode.Automatic;
+
 			HighlightExpiredCertificateCells();
 		}
 
@@ -143,7 +176,9 @@ namespace CertificateEnumeratorGUI
 			}
 		}
 
-		#region Save As Methods
+		#endregion
+
+		#region Save Methods
 
 		private void SaveCellsAs()
 		{

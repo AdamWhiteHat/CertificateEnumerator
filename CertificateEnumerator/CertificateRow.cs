@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Numerics;
 using System.IO;
 
-namespace CertificateEnumerator
+namespace CertificateEnumeratorGUI
 {
     public class CertificateRow : Certificate
     {

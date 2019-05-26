@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
 
-namespace CertificateEnumerator
+namespace CertificateEnumeratorGUI
 {
 	public partial class CertificateRowCollection : List<CertificateRow>
 	{
@@ -67,53 +67,7 @@ namespace CertificateEnumerator
 
 		public List<string> GetAllCertificatesRevocationListURLs()
 		{
-			List<string> crlUrlsToDownload = new List<string>();
-
-			string extraUrlsFilepath = Path.Combine(Utilities.DownloadPath, Utilities.ToDownloadFilename);
-			if (File.Exists(extraUrlsFilepath))
-			{
-				IEnumerable<string> additionalUrls = File.ReadAllLines(extraUrlsFilepath).Select(line => line.Trim()).Where(line => !string.IsNullOrWhiteSpace(line));
-
-				if (additionalUrls.Any())
-				{
-					crlUrlsToDownload.AddRange(additionalUrls);
-				}
-			}
-
-			crlUrlsToDownload.AddRange(this.SelectMany(crt => crt.GetCertificateRevocationListURLs()));
-
-			return crlUrlsToDownload.Distinct().ToList();
-		}
-
-		public List<string> DownloadAllCertificatesRevocationListURLs()
-		{
-			List<string> crlUrls = GetAllCertificatesRevocationListURLs();
-			return Utilities.DownloadFiles(crlUrls);
-		}
-
-		public List<string> InstallCertificatesRevocationLists(List<string> crlFilenames)
-		{
-			List<string> installedCRLs = new List<string>();
-			List<string> erroredCRLs = new List<string>();
-			foreach (string file in crlFilenames)
-			{
-				if (!File.Exists(file))
-				{
-					erroredCRLs.Add(file);
-					continue;
-				}
-
-				if (Utilities.InstallCertificateRevocationList(file))
-				{
-					installedCRLs.Add(file);
-				}
-				else
-				{
-					erroredCRLs.Add(file);
-				}
-			}
-
-			return installedCRLs;
+			return this.SelectMany(crt => crt.GetCertificateRevocationListURLs()).Distinct().ToList();
 		}
 
 		public List<string> GetAllCertificatesPublicKeys()
@@ -134,11 +88,14 @@ namespace CertificateEnumerator
 		private bool _verified = false;
 		public void VerifyAllCerts()
 		{
-			if (this.Count > 0 && !_verified)
+			if (!_verified)
 			{
-				foreach (CertificateRow row in this)
+				if (this.Count > 0 && !_verified)
 				{
-					row.Validate();
+					foreach (CertificateRow row in this)
+					{
+						row.Validate();
+					}
 				}
 				_verified = true;
 			}

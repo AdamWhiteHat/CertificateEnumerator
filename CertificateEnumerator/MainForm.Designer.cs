@@ -36,8 +36,9 @@
 			this.btnSearch = new System.Windows.Forms.Button();
 			this.tbSearch = new System.Windows.Forms.TextBox();
 			this.btnGetPublicKey = new System.Windows.Forms.Button();
-			this.btnCertRevocationLists = new System.Windows.Forms.Button();
+			this.btnDownloadCRLs = new System.Windows.Forms.Button();
 			this.btnSearchFolder = new System.Windows.Forms.Button();
+			this.btnInstallCRLs = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCertificates)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -45,7 +46,7 @@
 			// 
 			this.dataGridViewCertificates.AllowUserToAddRows = false;
 			this.dataGridViewCertificates.AllowUserToDeleteRows = false;
-			this.dataGridViewCertificates.AllowUserToOrderColumns = true;
+			this.dataGridViewCertificates.AllowUserToResizeRows = false;
 			this.dataGridViewCertificates.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -74,18 +75,19 @@
 			this.dataGridViewCertificates.RowHeadersVisible = false;
 			this.dataGridViewCertificates.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
 			this.dataGridViewCertificates.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-			this.dataGridViewCertificates.Size = new System.Drawing.Size(990, 413);
+			this.dataGridViewCertificates.Size = new System.Drawing.Size(930, 413);
 			this.dataGridViewCertificates.TabIndex = 4;
+			this.dataGridViewCertificates.Sorted += new System.EventHandler(this.dataGridViewCertificates_Sorted);
 			this.dataGridViewCertificates.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dataGridViewCertificates_KeyUp);
 			// 
 			// btnSaveCellsAs
 			// 
 			this.btnSaveCellsAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnSaveCellsAs.Location = new System.Drawing.Point(902, 2);
+			this.btnSaveCellsAs.Location = new System.Drawing.Point(841, 2);
 			this.btnSaveCellsAs.Name = "btnSaveCellsAs";
 			this.btnSaveCellsAs.Size = new System.Drawing.Size(91, 23);
 			this.btnSaveCellsAs.TabIndex = 7;
-			this.btnSaveCellsAs.Text = "Save as...";
+			this.btnSaveCellsAs.Text = "Save list as...";
 			this.btnSaveCellsAs.UseVisualStyleBackColor = true;
 			this.btnSaveCellsAs.Click += new System.EventHandler(this.btnSaveCellsAs_Click);
 			// 
@@ -97,7 +99,8 @@
 			// 
 			// btnSearch
 			// 
-			this.btnSearch.Location = new System.Drawing.Point(212, 2);
+			this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSearch.Location = new System.Drawing.Point(251, 2);
 			this.btnSearch.Name = "btnSearch";
 			this.btnSearch.Size = new System.Drawing.Size(86, 23);
 			this.btnSearch.TabIndex = 8;
@@ -107,37 +110,40 @@
 			// 
 			// tbSearch
 			// 
+			this.tbSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.tbSearch.Location = new System.Drawing.Point(3, 4);
 			this.tbSearch.Name = "tbSearch";
-			this.tbSearch.Size = new System.Drawing.Size(209, 20);
+			this.tbSearch.Size = new System.Drawing.Size(248, 20);
 			this.tbSearch.TabIndex = 9;
 			this.tbSearch.KeyUp += new System.Windows.Forms.KeyEventHandler(this.tbSearch_KeyUp);
 			// 
 			// btnGetPublicKey
 			// 
-			this.btnGetPublicKey.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.btnGetPublicKey.Location = new System.Drawing.Point(685, 2);
+			this.btnGetPublicKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnGetPublicKey.Location = new System.Drawing.Point(694, 2);
 			this.btnGetPublicKey.Name = "btnGetPublicKey";
-			this.btnGetPublicKey.Size = new System.Drawing.Size(105, 23);
+			this.btnGetPublicKey.Size = new System.Drawing.Size(148, 23);
 			this.btnGetPublicKey.TabIndex = 10;
-			this.btnGetPublicKey.Text = "Extract public keys";
+			this.btnGetPublicKey.Text = "Extract public keys to file";
 			this.btnGetPublicKey.UseVisualStyleBackColor = true;
 			this.btnGetPublicKey.Click += new System.EventHandler(this.btnGetPublicKey_Click);
 			// 
-			// btnCertRevocationLists
+			// btnDownloadCRLs
 			// 
-			this.btnCertRevocationLists.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.btnCertRevocationLists.Location = new System.Drawing.Point(527, 2);
-			this.btnCertRevocationLists.Name = "btnCertRevocationLists";
-			this.btnCertRevocationLists.Size = new System.Drawing.Size(159, 23);
-			this.btnCertRevocationLists.TabIndex = 11;
-			this.btnCertRevocationLists.Text = "Download && Install all CRLs";
-			this.btnCertRevocationLists.UseVisualStyleBackColor = true;
-			this.btnCertRevocationLists.Click += new System.EventHandler(this.btnCertRevocationLists_Click);
+			this.btnDownloadCRLs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnDownloadCRLs.Location = new System.Drawing.Point(474, 2);
+			this.btnDownloadCRLs.Name = "btnDownloadCRLs";
+			this.btnDownloadCRLs.Size = new System.Drawing.Size(100, 23);
+			this.btnDownloadCRLs.TabIndex = 11;
+			this.btnDownloadCRLs.Text = "Download  CRLs";
+			this.btnDownloadCRLs.UseVisualStyleBackColor = true;
+			this.btnDownloadCRLs.Click += new System.EventHandler(this.btnDownloadCRLs_Click);
 			// 
 			// btnSearchFolder
 			// 
-			this.btnSearchFolder.Location = new System.Drawing.Point(297, 2);
+			this.btnSearchFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSearchFolder.Location = new System.Drawing.Point(336, 2);
 			this.btnSearchFolder.Name = "btnSearchFolder";
 			this.btnSearchFolder.Size = new System.Drawing.Size(116, 23);
 			this.btnSearchFolder.TabIndex = 12;
@@ -145,19 +151,31 @@
 			this.btnSearchFolder.UseVisualStyleBackColor = true;
 			this.btnSearchFolder.Click += new System.EventHandler(this.btnSearchFolder_Click);
 			// 
+			// btnInstallCRLs
+			// 
+			this.btnInstallCRLs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnInstallCRLs.Location = new System.Drawing.Point(573, 2);
+			this.btnInstallCRLs.Name = "btnInstallCRLs";
+			this.btnInstallCRLs.Size = new System.Drawing.Size(100, 23);
+			this.btnInstallCRLs.TabIndex = 13;
+			this.btnInstallCRLs.Text = "Install CRLs";
+			this.btnInstallCRLs.UseVisualStyleBackColor = true;
+			this.btnInstallCRLs.Click += new System.EventHandler(this.btnInstallCRLs_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(994, 444);
+			this.ClientSize = new System.Drawing.Size(933, 444);
+			this.Controls.Add(this.btnInstallCRLs);
 			this.Controls.Add(this.btnSearchFolder);
-			this.Controls.Add(this.btnCertRevocationLists);
 			this.Controls.Add(this.btnGetPublicKey);
 			this.Controls.Add(this.tbSearch);
 			this.Controls.Add(this.btnSearch);
 			this.Controls.Add(this.btnSaveCellsAs);
 			this.Controls.Add(this.dataGridViewCertificates);
-			this.MinimumSize = new System.Drawing.Size(785, 300);
+			this.Controls.Add(this.btnDownloadCRLs);
+			this.MinimumSize = new System.Drawing.Size(850, 300);
 			this.Name = "MainForm";
 			this.Text = "Certificate Enumerator";
 			this.Load += new System.EventHandler(this.MainForm_Load);
@@ -175,8 +193,9 @@
 		private System.Windows.Forms.Button btnSearch;
 		private System.Windows.Forms.TextBox tbSearch;
         private System.Windows.Forms.Button btnGetPublicKey;
-        private System.Windows.Forms.Button btnCertRevocationLists;
+        private System.Windows.Forms.Button btnDownloadCRLs;
         private System.Windows.Forms.Button btnSearchFolder;
+		private System.Windows.Forms.Button btnInstallCRLs;
 	}
 }
 

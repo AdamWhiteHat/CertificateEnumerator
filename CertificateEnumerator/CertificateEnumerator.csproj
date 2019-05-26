@@ -51,6 +51,7 @@
       <HintPath>Assemblies\Microsoft.Office.Interop.Excel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
@@ -75,6 +76,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SettingsReader.cs" />
+    <Compile Include="SortableBindingList.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WebClientWithTimeout.cs">
       <SubType>Component</SubType>
@@ -109,6 +113,9 @@
   <ItemGroup>
     <Content Include="Assemblies\Microsoft.Office.Core.dll" />
     <Content Include="Assemblies\Microsoft.Office.Interop.Excel.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

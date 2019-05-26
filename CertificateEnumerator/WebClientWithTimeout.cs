@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CertificateEnumerator 
+namespace CertificateEnumeratorGUI
 {
     public class WebClientWithTimeout : WebClient
     {
