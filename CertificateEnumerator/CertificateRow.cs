@@ -46,11 +46,11 @@ namespace CertificateEnumeratorGUI
 
             if (lines == null || lines.Length < 1) { return new List<string>(); }
 
-            lines = lines.Select(ln => ln.ToLowerInvariant().Trim()).Distinct().ToArray();
+            lines = lines.Select(ln => ln.Trim()).Distinct().ToArray();
 
-            List<string> urls = lines.Where(ln => ln.StartsWith(urlMatchStart) && ln.EndsWith(urlMatchEnd))
+            List<string> urls = lines.Where(ln => ln.StartsWith(urlMatchStart,StringComparison.InvariantCultureIgnoreCase) && ln.EndsWith(urlMatchEnd, StringComparison.InvariantCultureIgnoreCase))
                                 .Distinct()
-                                .Select(addr => addr.Replace("url=", ""))
+                                .Select(addr => addr.Remove(0, 4))
                                 .ToList();
             return urls;
         }
