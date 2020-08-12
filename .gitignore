@@ -49,3 +49,4 @@ CertificateEnumerator/obj/*
 
 *.dat
 /.vs/CertificateEnumerator/v15/Server/sqlite3
+.vs
