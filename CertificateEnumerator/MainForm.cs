@@ -73,7 +73,7 @@ namespace CertificateEnumeratorGUI
 
 		private void btnGetPublicKey_Click(object sender, EventArgs e)
 		{
-			List<string> publicKeys = certificateRowCollection.GetAllCertificatesPublicKeys();
+			List<string> publicKeys = certificateRowCollection.GetAllCertificatesPublicKeyValues();
 
 			string filename = Utilities.EnsureFilenameNotExists(Utilities.PublicKeysStoreOutputFilename);
 			File.WriteAllLines(filename, publicKeys);
@@ -87,7 +87,7 @@ namespace CertificateEnumeratorGUI
 				{
 					List<X509Certificate2> certs = Utilities.SearchForCertsInFolder(dlg.SelectedPath);
 					CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
-					List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeys();
+					List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeyValues();
 
 					string filename = Utilities.EnsureFilenameNotExists(Utilities.PublicKeysFolderOutputFilename);
 					File.WriteAllLines(filename, publicKeys);
@@ -112,11 +112,21 @@ namespace CertificateEnumeratorGUI
 				List<Tuple<string, string>> successfullyDownloadedCRLs2 = Utilities.DownloadFiles(userSpecifiedCRLs);
 			}
 
-			List<string> certStoreCRLs = certificateRowCollection.GetAllCertificatesRevocationListURLs();
-			if (certStoreCRLs.Any())
+			if (dataGridViewCertificates.SelectedRows.Count > 0)
 			{
-				// Tuple<string, string> of the form: <RemoteFile, LocalFile>
-				List<Tuple<string, string>> successfullyDownloadedCRLs = Utilities.DownloadFiles(certStoreCRLs);
+				var selectedRows = dataGridViewCertificates.SelectedRows.Cast<DataGridViewRow>().ToList();
+				var selectedCertRows = selectedRows.Select(row => (CertificateRow)row.DataBoundItem).ToList();
+				var selectedCrlUrls = selectedCertRows.SelectMany(certRow => certRow.GetCertificateRevocationListURLs()).Distinct().ToList();
+				List<Tuple<string, string>> successfullyDownloadedSelectedCRLs = Utilities.DownloadFiles(selectedCrlUrls);
+			}
+			else
+			{
+				List<string> certStoreCRLs = certificateRowCollection.GetAllCertificatesRevocationListURLs();
+				if (certStoreCRLs.Any())
+				{
+					// Tuple<string, string> of the form: <RemoteFile, LocalFile>
+					List<Tuple<string, string>> successfullyDownloadedCRLs = Utilities.DownloadFiles(certStoreCRLs);
+				}
 			}
 		}
 
@@ -128,7 +138,7 @@ namespace CertificateEnumeratorGUI
 
 		private void Search(string value)
 		{
-			List<CertificateRow> newCertList = certificateRowCollection.Where(cr => cr.Contains(value)).ToList();
+			List<CertificateRow> newCertList = certificateRowCollection.Where(cr => cr.ContainsString(value)).ToList();
 			SetDataSource(newCertList);
 		}
 
@@ -153,6 +163,7 @@ namespace CertificateEnumeratorGUI
 
 			dataGridViewCertificates.Columns["IsVerified"].SortMode = DataGridViewColumnSortMode.Automatic;
 			dataGridViewCertificates.Columns["HasPrivateKey"].SortMode = DataGridViewColumnSortMode.Automatic;
+			dataGridViewCertificates.Columns["HasCrlDistributionPoint"].SortMode = DataGridViewColumnSortMode.Automatic;
 
 			HighlightExpiredCertificateCells();
 		}

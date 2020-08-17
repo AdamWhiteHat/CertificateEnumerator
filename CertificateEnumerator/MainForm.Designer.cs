@@ -72,7 +72,6 @@
 			dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
 			dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
 			this.dataGridViewCertificates.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
-			this.dataGridViewCertificates.RowHeadersVisible = false;
 			this.dataGridViewCertificates.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
 			this.dataGridViewCertificates.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
 			this.dataGridViewCertificates.Size = new System.Drawing.Size(930, 413);

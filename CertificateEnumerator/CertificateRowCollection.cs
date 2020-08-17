@@ -53,7 +53,7 @@ namespace CertificateEnumeratorGUI
 					X509Store store = new X509Store(name, location);
 					store.Open(OpenFlags.ReadOnly);
 
-					this.AddRange(CertificateRow.FromStore(store));
+					this.AddRange(FromStore(store));
 
 					store.Close();
 				}
@@ -65,12 +65,25 @@ namespace CertificateEnumeratorGUI
 		{
 		}
 
-		public List<string> GetAllCertificatesRevocationListURLs()
+		public static List<CertificateRow> FromStore(X509Store store)
 		{
-			return this.SelectMany(crt => crt.GetCertificateRevocationListURLs()).Distinct().ToList();
+			List<CertificateRow> results = new List<CertificateRow>();
+			foreach (X509Certificate2 cert in store.Certificates)
+			{
+				CertificateRow newRow = new CertificateRow(cert);
+				newRow.StoreName = store.Name;
+				newRow.StoreLocation = store.Location.ToString();
+				results.Add(newRow);
+			}
+			return results;
 		}
 
-		public List<string> GetAllCertificatesPublicKeys()
+		public List<string> GetAllCertificatesRevocationListURLs()
+		{
+			return this.SelectMany(crt => crt.CrlDistributionPointURLs).Distinct().ToList();
+		}
+
+		public List<string> GetAllCertificatesPublicKeyValues()
 		{
 			Dictionary<string, string> certificateDictionary = new Dictionary<string, string>();
 			foreach (CertificateRow cert in this)
@@ -78,7 +91,7 @@ namespace CertificateEnumeratorGUI
 				string thumbprint = cert.Thumbprint;
 				if (!certificateDictionary.ContainsKey(thumbprint))
 				{
-					certificateDictionary.Add(thumbprint, cert.GetPublicKey());
+					certificateDictionary.Add(thumbprint, cert.GetPublicKeyValue().ToString());
 				}
 			}
 

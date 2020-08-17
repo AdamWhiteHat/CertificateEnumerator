@@ -12,53 +12,25 @@ using System.IO;
 
 namespace CertificateEnumeratorGUI
 {
-    public class CertificateRow : Certificate
-    {
-        public bool HasErrors { get; private set; }
-        public string ErrorText { get; private set; }
-        public string ErrorProperty { get; private set; }
+	public class CertificateRow : Certificate
+	{
+		public bool HasErrors { get; private set; }
+		public string ErrorText { get; private set; }
+		public string ErrorProperty { get; private set; }
 
-        private static string urlMatchStart = "url=http";
-        private static string urlMatchEnd = ".crl";
+		public CertificateRow(X509Certificate2 certificate)
+			: base(certificate)
+		{ }
 
-        public CertificateRow(X509Certificate2 certificate)
-            : base(certificate)
-        { }
+		public BigInteger GetPublicKeyValue()
+		{
+			return Utilities.CalculateValue(certificate.GetPublicKey());
+		}
 
-        public string GetPublicKey()
-        {
-            return Utilities.CalculateValue(certificate.GetPublicKey()).ToString();
-        }
-               
-        public List<string> GetCertificateRevocationListURLs()
-        {
-            // [1]CRL Distribution Point
-            // URL=http://ss.symcb.com/ss.crl
-            /* - or - */
-            // [1]Authority Info Access
-            // URL=HTTP://cacerts.digicert.com/DigiCertSHA2ExtendedValidationServerCA.CRT
-                        
-            string certificateVerboseString = certificate.ToString(true);
-
-            if (string.IsNullOrWhiteSpace(certificateVerboseString)) { return new List<string>(); }
-
-            string[] lines = certificateVerboseString.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (lines == null || lines.Length < 1) { return new List<string>(); }
-
-            lines = lines.Select(ln => ln.Trim()).Distinct().ToArray();
-
-            List<string> urls = lines.Where(ln => ln.StartsWith(urlMatchStart,StringComparison.InvariantCultureIgnoreCase) && ln.EndsWith(urlMatchEnd, StringComparison.InvariantCultureIgnoreCase))
-                                .Distinct()
-                                .Select(addr => addr.Remove(0, 4))
-                                .ToList();
-            return urls;
-        }
-
-        public void Validate()
-        {
-            if (!HasErrors)
-            {
+		public void Validate()
+		{
+			if (!HasErrors)
+			{
 				// Validate not in Untrusted store
 				bool disallowed = false;
 
@@ -76,38 +48,38 @@ namespace CertificateEnumeratorGUI
 					userStore.Close();
 				}
 
-                if (disallowed)
-                {
-                    ErrorText = "Certificate in Untrusted store.";
-                    ErrorProperty = "StoreName";
-                    HasErrors = true;
-                }
+				if (disallowed)
+				{
+					ErrorText = "Certificate in Untrusted store.";
+					ErrorProperty = "StoreName";
+					HasErrors = true;
+				}
 
-                // Validate EffectiveDate & ExpirationDate
-                else if (DateTime.Now.CompareTo(this.EffectiveDate) < 0)
-                {
-                    ErrorText = "Certificate not in effect.";
-                    ErrorProperty = "EffectiveDate";
-                    HasErrors = true;
-                }
-                else if (DateTime.Now.CompareTo(this.ExpirationDate) > 0)
-                {
-                    ErrorText = "Certificate expired.";
-                    ErrorProperty = "ExpirationDate";
-                    HasErrors = true;
-                }
+				// Validate EffectiveDate & ExpirationDate
+				else if (DateTime.Now.CompareTo(this.EffectiveDate) < 0)
+				{
+					ErrorText = "Certificate not in effect.";
+					ErrorProperty = "EffectiveDate";
+					HasErrors = true;
+				}
+				else if (DateTime.Now.CompareTo(this.ExpirationDate) > 0)
+				{
+					ErrorText = "Certificate expired.";
+					ErrorProperty = "ExpirationDate";
+					HasErrors = true;
+				}
 
-                // Lastly, verify cert chain				
-                else if (!base.Verify())
-                {
-                    ErrorText = "Errors in the certificate chain.";
-                    ErrorProperty = "IsVerified";
-                    HasErrors = true;
-                }
-            }
-        }
+				// Lastly, verify cert chain				
+				else if (!base.Verify())
+				{
+					ErrorText = "Errors in the certificate chain.";
+					ErrorProperty = "IsVerified";
+					HasErrors = true;
+				}
+			}
+		}
 
-		static bool StoreContainsCertificate(StoreName storeName, StoreLocation storeLocation, X509Certificate2 certificate)
+		public static bool StoreContainsCertificate(StoreName storeName, StoreLocation storeLocation, X509Certificate2 certificate)
 		{
 			X509Store store = new X509Store(storeName, storeLocation);
 			X509Certificate2Collection certificates = null;
@@ -121,7 +93,7 @@ namespace CertificateEnumeratorGUI
 			finally
 			{
 				//SecurityUtils.ResetAllCertificates(certificates);
-				store.Close();				
+				store.Close();
 			}
 		}
 	}

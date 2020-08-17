@@ -8,10 +8,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("CertificateEnumerator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hewlett-Packard")]
+[assembly: AssemblyCompany("Adam White")]
 [assembly: AssemblyProduct("CertificateEnumerator")]
-[assembly: AssemblyCopyright("Copyright © Hewlett-Packard 2015")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Made by Adam White")]
+[assembly: AssemblyTrademark("https://github.com/AdamWhiteHat")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
