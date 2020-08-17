@@ -81,17 +81,15 @@ namespace CertificateEnumeratorGUI
 
 		private void btnSearchFolder_Click(object sender, EventArgs e)
 		{
-			using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+			string selectedPath = DialogHelper.BrowseForFolderDialog();
+			if (!string.IsNullOrEmpty(selectedPath))
 			{
-				if (dlg.ShowDialog() == DialogResult.OK)
-				{
-					List<X509Certificate2> certs = Utilities.SearchForCertsInFolder(dlg.SelectedPath);
-					CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
-					List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeyValues();
+				List<X509Certificate2> certs = Utilities.SearchForCertsInFolder(selectedPath);
+				CertificateRowCollection certRowCollection = CertificateRowCollection.FromList(certs);
+				List<string> publicKeys = certRowCollection.GetAllCertificatesPublicKeyValues();
 
-					string filename = Utilities.EnsureFilenameNotExists(Utilities.PublicKeysFolderOutputFilename);
-					File.WriteAllLines(filename, publicKeys);
-				}
+				string filename = Utilities.EnsureFilenameNotExists(Utilities.PublicKeysFolderOutputFilename);
+				File.WriteAllLines(filename, publicKeys);
 			}
 		}
 
@@ -284,6 +282,58 @@ namespace CertificateEnumeratorGUI
 				Clipboard.SetDataObject(objectSave);
 			}
 			return result;
+		}
+
+		#endregion
+
+		#region Context Menu Events
+
+		private CertificateRow GetSelectedRow()
+		{
+			var selectedRows = dataGridViewCertificates.SelectedRows.Cast<DataGridViewRow>().ToList();
+			var selectedCertRows = selectedRows.Select(row => (CertificateRow)row.DataBoundItem).ToList();
+			var selectedRow = selectedCertRows.First();
+			return selectedRow;
+		}
+
+		private void dataGridViewCertificates_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
+		{
+			dataGridViewCertificates.ClearSelection();
+			dataGridViewCertificates.Rows[e.RowIndex].Selected = true;
+		}
+
+		private void toolStripMenuItemOpen_Click(object sender, EventArgs e)
+		{
+			CertificateRow row = GetSelectedRow();
+			X509Certificate2UI.DisplayCertificate(row.certificate);
+		}
+
+		private void toolStripMenuItemExport_Click(object sender, EventArgs e)
+		{
+			string saveFile = DialogHelper.SaveFileDialog();
+			if (!string.IsNullOrEmpty(saveFile))
+			{
+				CertificateRow row = GetSelectedRow();
+				byte[] bytes = row.certificate.Export(X509ContentType.Cert);
+				File.WriteAllBytes(saveFile, bytes);
+			}
+		}
+
+		private void toolStripMenuItemCopy_Click(object sender, EventArgs e)
+		{
+			DataObject dataObject = dataGridViewCertificates.GetClipboardContent();
+			Clipboard.SetDataObject(dataObject, false);
+		}
+
+		private void toolStripMenuItemDelete_Click(object sender, EventArgs e)
+		{
+			CertificateRow row = GetSelectedRow();
+			row.Remove();
+		}
+
+		private void toolStripMenuItemSelectAll_Click(object sender, EventArgs e)
+		{
+			dataGridViewCertificates.SelectAll();
 		}
 
 		#endregion

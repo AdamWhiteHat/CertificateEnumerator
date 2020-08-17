@@ -29,7 +29,7 @@ namespace CertificateEnumeratorGUI
 		public List<string> Extentions { get; private set; }
 		public List<string> CrlDistributionPointURLs { get; private set; }
 
-		protected X509Certificate2 certificate;
+		internal X509Certificate2 certificate;
 
 		private static string urlMatchStart = "url=http";
 		private static string urlMatchEnd = ".crl";
@@ -120,6 +120,17 @@ namespace CertificateEnumeratorGUI
 								.Select(addr => addr.Remove(0, 4))
 								.ToList();
 			return urls;
+		}
+
+		public void Remove()
+		{
+			StoreName storeName = (StoreName)Enum.Parse(typeof(StoreName), StoreName);
+			StoreLocation storeLocation = (StoreLocation)Enum.Parse(typeof(StoreLocation), StoreLocation);
+
+			X509Store store = new X509Store(storeName, storeLocation);
+			store.Open(OpenFlags.ReadWrite);
+			store.Remove(certificate);
+			store.Close();
 		}
 
 		public bool ContainsString(string value)

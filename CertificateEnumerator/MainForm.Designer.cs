@@ -28,9 +28,18 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.dataGridViewCertificates = new System.Windows.Forms.DataGridView();
+			this.contextMenuDataGridRow = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.toolStripMenuItemOpen = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItemExport = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.toolStripMenuItemCopy = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItemDelete = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.toolStripMenuItemSelectAll = new System.Windows.Forms.ToolStripMenuItem();
 			this.btnSaveCellsAs = new System.Windows.Forms.Button();
 			this.saveFileDialogSelectedCells = new System.Windows.Forms.SaveFileDialog();
 			this.btnSearch = new System.Windows.Forms.Button();
@@ -40,6 +49,7 @@
 			this.btnSearchFolder = new System.Windows.Forms.Button();
 			this.btnInstallCRLs = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCertificates)).BeginInit();
+			this.contextMenuDataGridRow.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// dataGridViewCertificates
@@ -59,6 +69,7 @@
 			dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
 			this.dataGridViewCertificates.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
 			this.dataGridViewCertificates.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.dataGridViewCertificates.ContextMenuStrip = this.contextMenuDataGridRow;
 			this.dataGridViewCertificates.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
 			this.dataGridViewCertificates.Location = new System.Drawing.Point(2, 28);
 			this.dataGridViewCertificates.Margin = new System.Windows.Forms.Padding(0);
@@ -76,8 +87,67 @@
 			this.dataGridViewCertificates.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
 			this.dataGridViewCertificates.Size = new System.Drawing.Size(930, 413);
 			this.dataGridViewCertificates.TabIndex = 4;
+			this.dataGridViewCertificates.CellContextMenuStripNeeded += new System.Windows.Forms.DataGridViewCellContextMenuStripNeededEventHandler(this.dataGridViewCertificates_CellContextMenuStripNeeded);
 			this.dataGridViewCertificates.Sorted += new System.EventHandler(this.dataGridViewCertificates_Sorted);
 			this.dataGridViewCertificates.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dataGridViewCertificates_KeyUp);
+			// 
+			// contextMenuDataGridRow
+			// 
+			this.contextMenuDataGridRow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemOpen,
+            this.toolStripMenuItemExport,
+            this.toolStripSeparator1,
+            this.toolStripMenuItemCopy,
+            this.toolStripMenuItemDelete,
+            this.toolStripSeparator2,
+            this.toolStripMenuItemSelectAll});
+			this.contextMenuDataGridRow.Name = "contextMenuDataGridRow";
+			this.contextMenuDataGridRow.Size = new System.Drawing.Size(123, 126);
+			// 
+			// toolStripMenuItemOpen
+			// 
+			this.toolStripMenuItemOpen.Name = "toolStripMenuItemOpen";
+			this.toolStripMenuItemOpen.Size = new System.Drawing.Size(122, 22);
+			this.toolStripMenuItemOpen.Text = "Open";
+			this.toolStripMenuItemOpen.Click += new System.EventHandler(this.toolStripMenuItemOpen_Click);
+			// 
+			// toolStripMenuItemExport
+			// 
+			this.toolStripMenuItemExport.Name = "toolStripMenuItemExport";
+			this.toolStripMenuItemExport.Size = new System.Drawing.Size(122, 22);
+			this.toolStripMenuItemExport.Text = "Export...";
+			this.toolStripMenuItemExport.Click += new System.EventHandler(this.toolStripMenuItemExport_Click);
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size(119, 6);
+			// 
+			// toolStripMenuItemCopy
+			// 
+			this.toolStripMenuItemCopy.Name = "toolStripMenuItemCopy";
+			this.toolStripMenuItemCopy.Size = new System.Drawing.Size(122, 22);
+			this.toolStripMenuItemCopy.Text = "Copy";
+			this.toolStripMenuItemCopy.Click += new System.EventHandler(this.toolStripMenuItemCopy_Click);
+			// 
+			// toolStripMenuItemDelete
+			// 
+			this.toolStripMenuItemDelete.Name = "toolStripMenuItemDelete";
+			this.toolStripMenuItemDelete.Size = new System.Drawing.Size(122, 22);
+			this.toolStripMenuItemDelete.Text = "Delete";
+			this.toolStripMenuItemDelete.Click += new System.EventHandler(this.toolStripMenuItemDelete_Click);
+			// 
+			// toolStripSeparator2
+			// 
+			this.toolStripSeparator2.Name = "toolStripSeparator2";
+			this.toolStripSeparator2.Size = new System.Drawing.Size(119, 6);
+			// 
+			// toolStripMenuItemSelectAll
+			// 
+			this.toolStripMenuItemSelectAll.Name = "toolStripMenuItemSelectAll";
+			this.toolStripMenuItemSelectAll.Size = new System.Drawing.Size(122, 22);
+			this.toolStripMenuItemSelectAll.Text = "Select All";
+			this.toolStripMenuItemSelectAll.Click += new System.EventHandler(this.toolStripMenuItemSelectAll_Click);
 			// 
 			// btnSaveCellsAs
 			// 
@@ -179,6 +249,7 @@
 			this.Text = "Certificate Enumerator";
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewCertificates)).EndInit();
+			this.contextMenuDataGridRow.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -195,6 +266,14 @@
         private System.Windows.Forms.Button btnDownloadCRLs;
         private System.Windows.Forms.Button btnSearchFolder;
 		private System.Windows.Forms.Button btnInstallCRLs;
+		private System.Windows.Forms.ContextMenuStrip contextMenuDataGridRow;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemOpen;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemExport;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemCopy;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDelete;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSelectAll;
 	}
 }
 
