@@ -298,8 +298,11 @@ namespace CertificateEnumeratorGUI
 
 		private void dataGridViewCertificates_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
 		{
-			dataGridViewCertificates.ClearSelection();
-			dataGridViewCertificates.Rows[e.RowIndex].Selected = true;
+			if (e.RowIndex != -1)
+			{
+				dataGridViewCertificates.ClearSelection();
+				dataGridViewCertificates.Rows[e.RowIndex].Selected = true;
+			}
 		}
 
 		private void toolStripMenuItemOpen_Click(object sender, EventArgs e)

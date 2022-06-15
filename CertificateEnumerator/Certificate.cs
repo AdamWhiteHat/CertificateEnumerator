@@ -24,10 +24,16 @@ namespace CertificateEnumeratorGUI
 		public string Thumbprint { get; private set; }
 		public string KeyAlgorithm { get; private set; }
 		public string SignatureAlgorithm { get; private set; }
+		public string Hash { get; private set; }
 		public string Version { get; private set; }
 		public string Format { get; private set; }
+		public string PublicKeyType { get; private set; }
+		public string PublicKeySize { get; private set; }
+
 		public List<string> Extentions { get; private set; }
 		public List<string> CrlDistributionPointURLs { get; private set; }
+
+		internal string[] RawStrings { get; set; }
 
 		internal X509Certificate2 certificate;
 
@@ -56,14 +62,38 @@ namespace CertificateEnumeratorGUI
 			SignatureAlgorithm = certificate.SignatureAlgorithm.FriendlyName;
 			Version = certificate.Version.ToString();
 
+			PublicKeyType = certificate.PublicKey.Oid.FriendlyName;
+			if (PublicKeyType != "ECC" && certificate.PublicKey.Key != null)
+			{
+				PublicKeySize = certificate.PublicKey.Key.KeySize.ToString();
+			}
+
+			X509Certificate oldCert = (X509Certificate)certificate;
+			Hash = oldCert.GetCertHashString();
+
 			Extentions = new List<string>();
 			foreach (X509Extension ext in certificate.Extensions)
 			{
 				Extentions.Add(ext.Format(false));
 			}
 
+			RawStrings = GetRawStrings(certificate);
+
 			CrlDistributionPointURLs = GetCertificateRevocationListURLs();
 			HasCrlDistributionPoint = CrlDistributionPointURLs.Any();
+		}
+
+		private static string[] GetRawStrings(X509Certificate2 cert)
+		{
+			string certificateVerboseString = cert.ToString(true);
+
+			if (string.IsNullOrWhiteSpace(certificateVerboseString)) { return new string[0]; }
+
+			string[] lines = certificateVerboseString.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+			if (lines == null || lines.Length < 1) { return new string[0]; }
+
+			return lines.Select(ln => ln.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToArray();
 		}
 
 		public bool Verify()
@@ -98,17 +128,9 @@ namespace CertificateEnumeratorGUI
 			 * 
 			 */
 
-			string certificateVerboseString = certificate.ToString(true);
 
-			if (string.IsNullOrWhiteSpace(certificateVerboseString)) { return new List<string>(); }
 
-			string[] lines = certificateVerboseString.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-			if (lines == null || lines.Length < 1) { return new List<string>(); }
-
-			lines = lines.Select(ln => ln.Trim()).Distinct().ToArray();
-
-			List<string> urls = lines
+			List<string> urls = RawStrings
 								.Where
 								(
 									ln =>
