@@ -4,15 +4,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using System.IdentityModel.Selectors;
+using System.Numerics;
+using System.Security.Cryptography;
 
-namespace CertificateEnumeratorGUI
+namespace CertificateManagement
 {
-	public class Certificate
+	public class CertificateRow
 	{
-		public bool IsVerified { get; protected set; }
+		public bool HasErrors { get; private set; }
+		public string ErrorText { get; private set; }
+		public string ErrorProperty { get; private set; }
 		public bool HasPrivateKey { get; private set; }
-		public bool HasCrlDistributionPoint { get; private set; }
 		public DateTime EffectiveDate { get; private set; }
 		public DateTime ExpirationDate { get; private set; }
 		public string StoreLocation { get; internal set; }
@@ -30,17 +32,25 @@ namespace CertificateEnumeratorGUI
 		public string PublicKeyType { get; private set; }
 		public string PublicKeySize { get; private set; }
 
+		public bool IsChainVerified { get; protected set; }
+		public string ChainRevokedStatusInformation { get; protected set; }
+		public DateTime ChainVerificationTime { get; private set; }
+		public int ChainLength { get; private set; }
+
+		public string ChainApplicationPolicy { get; private set; }
+
+		public string ChainCertificatePolicy { get; private set; }
+
 		public List<string> Extentions { get; private set; }
-		public List<string> CrlDistributionPointURLs { get; private set; }
 
 		internal string[] RawStrings { get; set; }
 
 		internal X509Certificate2 certificate;
 
-		private static string urlMatchStart = "url=http";
-		private static string urlMatchEnd = ".crl";
+		private static readonly string urlMatchStart = "url=http";
+		private static readonly string urlMatchEnd = ".crl";
 
-		public Certificate(X509Certificate2 cert)
+		public CertificateRow(X509Certificate2 cert)
 		{
 			if (cert == null)
 			{
@@ -78,9 +88,6 @@ namespace CertificateEnumeratorGUI
 			}
 
 			RawStrings = GetRawStrings(certificate);
-
-			CrlDistributionPointURLs = GetCertificateRevocationListURLs();
-			HasCrlDistributionPoint = CrlDistributionPointURLs.Any();
 		}
 
 		private static string[] GetRawStrings(X509Certificate2 cert)
@@ -96,18 +103,117 @@ namespace CertificateEnumeratorGUI
 			return lines.Select(ln => ln.Trim()).Where(s => !string.IsNullOrWhiteSpace(s)).Distinct().ToArray();
 		}
 
-		public bool Verify()
+		public BigInteger GetPublicKeyValue()
 		{
-			if (certificate == null)
+			return Utilities.CalculateValue(certificate.GetPublicKey());
+		}
+
+		public void Validate()
+		{
+			if (!HasErrors)
 			{
-				return false;
-			}
-			else
-			{
-				IsVerified = certificate.Verify();
-				return IsVerified;
+				// Validate not in Untrusted store
+				bool disallowed = false;
+
+				disallowed = (this.StoreName == "Disallowed");
+
+				if (!disallowed)
+				{
+					X509Store machineStore = new X509Store(System.Security.Cryptography.X509Certificates.StoreName.Disallowed, System.Security.Cryptography.X509Certificates.StoreLocation.LocalMachine);
+					X509Store userStore = new X509Store(System.Security.Cryptography.X509Certificates.StoreName.Disallowed, System.Security.Cryptography.X509Certificates.StoreLocation.CurrentUser);
+
+					disallowed |= machineStore.Certificates.Contains(this.certificate);
+					disallowed |= userStore.Certificates.Contains(this.certificate);
+
+					machineStore.Close();
+					userStore.Close();
+				}
+
+				if (disallowed)
+				{
+					ErrorText = "Certificate in Untrusted store.";
+					ErrorProperty = "StoreName";
+					HasErrors = true;
+				}
+
+				// Validate EffectiveDate & ExpirationDate
+				else if (DateTime.Now.CompareTo(this.EffectiveDate) < 0)
+				{
+					ErrorText = "Certificate not in effect.";
+					ErrorProperty = "EffectiveDate";
+					HasErrors = true;
+				}
+				else if (DateTime.Now.CompareTo(this.ExpirationDate) > 0)
+				{
+					ErrorText = "Certificate expired.";
+					ErrorProperty = "ExpirationDate";
+					HasErrors = true;
+				}
+
+				// Lastly, verify cert chain		
+				IsChainVerified = certificate.Verify();
+				if (!IsChainVerified)
+				{
+					ErrorText = "Errors in the certificate chain.";
+					ErrorProperty = "IsChainVerified";
+					HasErrors = true;
+				}
+
+				using (X509Chain chain = new X509Chain())
+				{
+					chain.ChainPolicy.RevocationFlag = X509RevocationFlag.EntireChain;
+					chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
+					chain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
+
+					bool isValidCert = chain.Build(certificate);
+					if (!isValidCert)
+					{
+						IsChainVerified = false;
+
+						foreach (X509ChainStatus status in chain.ChainStatus)
+						{
+							if (status.Status != X509ChainStatusFlags.NoError)
+							{
+								ChainRevokedStatusInformation = status.StatusInformation;
+							}
+						}
+
+						ErrorText = "Errors in the certificate chain.";
+						if (!string.IsNullOrWhiteSpace(ChainRevokedStatusInformation))
+						{
+							ErrorText = ChainRevokedStatusInformation;
+						}
+						ErrorProperty = "IsChainVerified";
+						HasErrors = true;
+					}
+
+
+					ChainVerificationTime = chain.ChainPolicy.VerificationTime;
+					ChainLength = chain.ChainStatus.Length;
+
+					int appPolCount = chain.ChainPolicy.ApplicationPolicy.Count;
+					int certPolCount = chain.ChainPolicy.CertificatePolicy.Count;
+
+					StringBuilder stringBuilder = new StringBuilder();
+					foreach (Oid oid in chain.ChainPolicy.ApplicationPolicy)
+					{
+						stringBuilder.Append(oid.FriendlyName);
+						stringBuilder.Append(", ");
+					}
+					ChainApplicationPolicy = stringBuilder.ToString();
+					stringBuilder.Clear();
+
+					foreach (Oid oid in chain.ChainPolicy.CertificatePolicy)
+					{
+						stringBuilder.Append(oid.FriendlyName);
+						stringBuilder.Append(", ");
+					}
+					ChainCertificatePolicy = stringBuilder.ToString();
+				}
 			}
 		}
+
+
 
 		public List<string> GetCertificateRevocationListURLs()
 		{
@@ -127,8 +233,6 @@ namespace CertificateEnumeratorGUI
 			 * URL=HTTP://cacerts.digicert.com/DigiCertSHA2ExtendedValidationServerCA.CRT
 			 * 
 			 */
-
-
 
 			List<string> urls = RawStrings
 								.Where
@@ -175,6 +279,25 @@ namespace CertificateEnumeratorGUI
 				|| ExpirationDate.ToString().Contains(value)
 			);
 		}
+
+		public static bool StoreContainsCertificate(StoreName storeName, StoreLocation storeLocation, X509Certificate2 certificate)
+		{
+			X509Store store = new X509Store(storeName, storeLocation);
+			X509Certificate2Collection certificates = null;
+			try
+			{
+				store.Open(OpenFlags.ReadOnly);
+
+				certificates = store.Certificates.Find(X509FindType.FindByThumbprint, certificate.GetCertHash(), false);
+				return certificates.Count > 0;
+			}
+			finally
+			{
+				//SecurityUtils.ResetAllCertificates(certificates);
+				store.Close();
+			}
+		}
+
 	}
 }
 

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 
-namespace CertificateEnumeratorGUI
+namespace CertificateManagement
 {
 	public static class Utilities
 	{
@@ -30,7 +30,7 @@ namespace CertificateEnumeratorGUI
 
 		private static string dashedLine = "---";
 		private static BigInteger ByteMax = new BigInteger(256);
-		private static int webRequestTimeout = 2000;
+		public static int WebRequestTimeout = 2000;
 
 		public static List<string> GetTimestampLogfileHeader()
 		{
@@ -101,67 +101,6 @@ namespace CertificateEnumeratorGUI
 			}
 
 			return new List<string>();
-		}
-
-		public static List<Tuple<string, string>> DownloadFiles(List<string> remoteFileURIs)
-		{
-			List<Tuple<string, string>> successCRLs = new List<Tuple<string, string>>();
-			List<Tuple<string, string>> failedCRLs = new List<Tuple<string, string>>();
-
-			EnsureDirectoryExists(DownloadPath);
-
-			using (WebClientWithTimeout client = new WebClientWithTimeout(webRequestTimeout))
-			{
-				foreach (string remoteFile in remoteFileURIs)
-				{
-					string localFile = string.Empty;
-					try
-					{
-						Uri uri = new Uri(remoteFile);
-						if (uri == null) { continue; }
-						string filename = uri.LocalPath.TrimStart('/', '\\');
-
-						int index = filename.LastIndexOf('/');
-						if (index != -1)
-						{
-							filename = filename.Substring(index + 1);
-						}
-
-						if (string.IsNullOrWhiteSpace(filename)) { continue; }
-						localFile = Path.Combine(DownloadPath, filename);
-
-						// TODO: Make async                      
-						client.DownloadFile(remoteFile, localFile);
-
-						if (File.Exists(localFile))
-						{
-							successCRLs.Add(new Tuple<string, string>(remoteFile, localFile));
-						}
-						else
-						{
-							failedCRLs.Add(new Tuple<string, string>(remoteFile, localFile));
-						}
-					}
-					catch (WebException)
-					{
-						failedCRLs.Add(new Tuple<string, string>(remoteFile, localFile));
-					}
-				}
-			}
-
-			if (failedCRLs.Any())
-			{
-				string errorFilepath = Path.Combine(Utilities.DownloadPath, Utilities.FailedDownloadsFilename);
-				File.AppendAllLines(errorFilepath, WrapLinesForLogging(failedCRLs.Select(tup => string.Format("\tURL: {0,-75} DEST: \"{1}\"", $"\"{tup.Item1}\"", tup.Item2))));
-			}
-
-			if (successCRLs.Any())
-			{
-				string successFilepath = Path.Combine(Utilities.DownloadPath, Utilities.SuccessfullyDownloadedFilename);
-				File.AppendAllLines(successFilepath, WrapLinesForLogging(successCRLs.Select(tup => string.Format("\tURL: {0,-75} DEST: \"{1}\"", $"\"{tup.Item1}\"", tup.Item2))));
-			}
-
-			return successCRLs;
 		}
 
 		public static List<string> InstallCertificateRevocationLists(List<string> crlFilenames)

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CertificateEnumeratorGUI
+namespace CertificateManagement
 {
 	public class SortableBindingList<T> : BindingList<T>
 	{

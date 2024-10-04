@@ -1,52 +1,92 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
 
-namespace CertificateEnumeratorGUI
+namespace CertificateManagement
 {
-	public static class DialogHelper
-	{
-		public static string BrowseForFolderDialog(string initialDirectory = "")
-		{
-			using (FolderBrowserDialog browseDialog = new FolderBrowserDialog())
-			{
-				browseDialog.SelectedPath = initialDirectory;
-				//browseDialog.RootFolder = Environment.SpecialFolder.ProgramFilesX86;
-				if (browseDialog.ShowDialog() == DialogResult.OK)
-				{
-					return browseDialog.SelectedPath;
-				}
-			}
+    public static class DialogHelper
+    {
+        private static string browseForFolderLocation = "";
+        private static string browseForFileLocation = "";
+        private static string saveFileLocation = "";        
 
-			return string.Empty;
-		}
+        static DialogHelper()
+        {
+            string initialFolderLocation = "";
+            try
+            {
+                initialFolderLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            }
+            catch
+            {
+                initialFolderLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
 
-		public static string BrowseForFileDialog(string initialDirectory = "")
-		{
-			using (OpenFileDialog browseDialog = new OpenFileDialog())
-			{
-				browseDialog.InitialDirectory = initialDirectory;
-				//browseDialog.RootFolder = Environment.SpecialFolder.ProgramFilesX86;
-				if (browseDialog.ShowDialog() == DialogResult.OK)
-				{
-					return browseDialog.FileName;
-				}
-			}
+            browseForFileLocation = initialFolderLocation;
+            browseForFileLocation = initialFolderLocation;
+            saveFileLocation = initialFolderLocation;
+        }
 
-			return string.Empty;
-		}
+        public static string BrowseForFolderDialog(string initialDirectory)
+        {
+            browseForFolderLocation = initialDirectory;
+            return BrowseForFolderDialog();
+        }
+        public static string BrowseForFolderDialog()
+        {
 
-		public static string SaveFileDialog(string initialDirectory = "")
-		{
-			using (SaveFileDialog browseDialog = new SaveFileDialog())
-			{
-				browseDialog.InitialDirectory = initialDirectory;
-				//browseDialog.RootFolder = Environment.SpecialFolder.ProgramFilesX86;
-				if (browseDialog.ShowDialog() == DialogResult.OK)
-				{
-					return browseDialog.FileName;
-				}
-			}
+            using (FolderBrowserDialog browseDialog = new FolderBrowserDialog())
+            {
+                browseDialog.SelectedPath = browseForFolderLocation;
 
-			return string.Empty;
-		}
-	}
+                if (browseDialog.ShowDialog() == DialogResult.OK)
+                {
+                    browseForFolderLocation = Path.GetDirectoryName(browseDialog.SelectedPath);
+                    return browseDialog.SelectedPath;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        public static string BrowseForFileDialog(string initialDirectory)
+        {
+            browseForFileLocation = initialDirectory;
+            return BrowseForFileDialog();
+        }
+        public static string BrowseForFileDialog()
+        {
+            using (OpenFileDialog browseDialog = new OpenFileDialog())
+            {
+                browseDialog.InitialDirectory = browseForFileLocation;
+                if (browseDialog.ShowDialog() == DialogResult.OK)
+                {
+                    browseForFileLocation = Path.GetDirectoryName(browseDialog.FileName);
+                    return browseDialog.FileName;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        public static string SaveFileDialog(string initialFilename = "", string filters = "All Files|*.*")
+        {
+            using (SaveFileDialog browseDialog = new SaveFileDialog())
+            {
+                browseDialog.Filter = filters;
+                browseDialog.InitialDirectory = saveFileLocation;
+                if (!string.IsNullOrWhiteSpace(initialFilename))
+                {
+                    browseDialog.FileName = Path.Combine(saveFileLocation, initialFilename);
+                }
+                if (browseDialog.ShowDialog() == DialogResult.OK)
+                {
+                    saveFileLocation = Path.GetDirectoryName(browseDialog.FileName);
+                    return browseDialog.FileName;
+                }
+            }
+            return string.Empty;
+        }
+    }
 }

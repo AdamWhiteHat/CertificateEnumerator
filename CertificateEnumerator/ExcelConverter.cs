@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Excel;
 
-namespace CertificateEnumeratorGUI
+namespace CertificateManagement
 {
 	public static class ExcelConverter
 	{

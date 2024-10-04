@@ -4,7 +4,7 @@ using System.Linq;
 using System.Configuration;
 using System.Collections.Generic;
 
-namespace CertificateEnumeratorGUI
+namespace CertificateManagement
 {
 	public static class SettingsReader
 	{
