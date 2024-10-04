@@ -190,7 +190,6 @@ namespace CertificateManagement
 
             dataGridViewCertificates.Columns["IsChainVerified"].SortMode = DataGridViewColumnSortMode.Automatic;
             dataGridViewCertificates.Columns["HasPrivateKey"].SortMode = DataGridViewColumnSortMode.Automatic;
-            dataGridViewCertificates.Columns["HasCrlDistributionPoint"].SortMode = DataGridViewColumnSortMode.Automatic;
 
             HighlightExpiredCertificateCells();
         }
