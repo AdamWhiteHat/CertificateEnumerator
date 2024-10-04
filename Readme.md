@@ -9,7 +9,6 @@
 
 
 
-
 CertificateEnumerator can list every certificate in your various certificate stores for your local machine and currently logged in user. It can then display that information to you either in a DataGridView or TextBox (as columnarized text), and provides the ability to persist that information to file as text, comma separated values (CSV), excel format or HTML table. 
 
 The Certificate Enumerator also has the ability to 'validate' each certificate against its CRL (certificate revocation list), if it supplied one.
