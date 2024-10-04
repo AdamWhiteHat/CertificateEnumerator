@@ -191,6 +191,22 @@ namespace CertificateManagement
             dataGridViewCertificates.Columns["IsChainVerified"].SortMode = DataGridViewColumnSortMode.Automatic;
             dataGridViewCertificates.Columns["HasPrivateKey"].SortMode = DataGridViewColumnSortMode.Automatic;
 
+            dataGridViewCertificates.Columns["HasPrivateKey"].HeaderText = "Private Key?";
+            dataGridViewCertificates.Columns["EffectiveDate"].HeaderText = "Effective Date";
+            dataGridViewCertificates.Columns["ExpirationDate"].HeaderText = "Expiration Date";
+            dataGridViewCertificates.Columns["StoreLocation"].HeaderText = "Store Location";
+            dataGridViewCertificates.Columns["StoreName"].HeaderText = "Store Name";
+            dataGridViewCertificates.Columns["FriendlyName"].HeaderText = "Friendly Name";
+            dataGridViewCertificates.Columns["SerialNumber"].HeaderText = "Serial Number";
+            dataGridViewCertificates.Columns["KeyAlgorithm"].HeaderText = "Key Algorithm";
+            dataGridViewCertificates.Columns["SignatureAlgorithm"].HeaderText = "Signature Algorithm";
+            dataGridViewCertificates.Columns["PublicKeyType"].HeaderText = "Key Type";
+            dataGridViewCertificates.Columns["PublicKeySize"].HeaderText = "Key Size";
+            dataGridViewCertificates.Columns["IsChainVerified"].HeaderText = "Is Verified?";
+            dataGridViewCertificates.Columns["ChainRevokedStatusInformation"].HeaderText = "Revoked Reason";
+            dataGridViewCertificates.Columns["ChainVerificationTime"].HeaderText = "Verification Time";
+            dataGridViewCertificates.Columns["ChainLength"].HeaderText = "Chain Length";
+
             HighlightExpiredCertificateCells();
         }
 
