@@ -1,15 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Data;
-using System.Linq;
-using System.Drawing;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections;
-using System.Windows.Forms;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CertificateManagement
 {
@@ -45,16 +46,22 @@ namespace CertificateManagement
         private CertificateRowCollection _viewDataSouce = new CertificateRowCollection();
 
         private bool _isLoaded = false;
+        private DataGridViewCellStyle _headerCellStyle;
 
         public CertificateStoreView()
         {
             InitializeComponent();
+            /*
+            _headerCellStyle = new DataGridViewCellStyle(dataGridViewCertificates.ColumnHeadersDefaultCellStyle);
+            _headerCellStyle.BackColor = Color.Silver;
+             _headerCellStyle.Font.Bold = true;
+            dataGridViewCertificates.EnableHeadersVisualStyles = false;
+            */
         }
 
         public CertificateStoreView(CertificateRowCollection certificates)
             : this()
         {
-
             ViewDataSouce = certificates;
         }
 
@@ -103,6 +110,10 @@ namespace CertificateManagement
                 {
                     SaveCellsAs();
                 }
+                else if (e.KeyData == Keys.C)
+                {
+                    CopyCellsToClipboard();
+                }
             }
             else if (e.KeyData == Keys.F5)
             {
@@ -113,7 +124,6 @@ namespace CertificateManagement
                 ResetVewToDefault();
             }
         }
-
 
         private void btnGetPublicKey_Click(object sender, EventArgs e)
         {
@@ -207,6 +217,30 @@ namespace CertificateManagement
             dataGridViewCertificates.Columns["ChainVerificationTime"].HeaderText = "Verification Time";
             dataGridViewCertificates.Columns["ChainLength"].HeaderText = "Chain Length";
 
+            /*
+            dataGridViewCertificates.Columns["HasPrivateKey"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["EffectiveDate"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["ExpirationDate"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["StoreLocation"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["StoreName"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["FriendlyName"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["SerialNumber"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["KeyAlgorithm"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["SignatureAlgorithm"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["PublicKeyType"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["PublicKeySize"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["IsChainVerified"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["ChainRevokedStatusInformation"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["ChainVerificationTime"].HeaderCell.Style = _headerCellStyle;
+            dataGridViewCertificates.Columns["ChainLength"].HeaderCell.Style = _headerCellStyle;
+            */
+
+            dataGridViewCertificates.AllowUserToResizeRows = false;
+            foreach (DataGridViewRow row in dataGridViewCertificates.Rows)
+            {
+                row.Resizable = DataGridViewTriState.False;
+            }
+
             HighlightExpiredCertificateCells();
         }
 
@@ -215,7 +249,6 @@ namespace CertificateManagement
             ViewDataSouce.VerifyAllCerts();
             UpdateRowErrorHighlighting();
         }
-
 
         private void UpdateRowErrorHighlighting()
         {
@@ -230,10 +263,6 @@ namespace CertificateManagement
                     {
                         cell.ErrorText = certRow.ErrorText;
                     }
-                }
-                else
-                {
-
                 }
             }
         }
@@ -347,8 +376,8 @@ namespace CertificateManagement
 
         private CertificateRow GetSelectedRow()
         {
-            var selectedRows = dataGridViewCertificates.SelectedRows.Cast<DataGridViewRow>().ToList();
-            var selectedCertRows = selectedRows.Select(row => (CertificateRow)row.DataBoundItem).ToList();
+            var selectedRows = dataGridViewCertificates.SelectedRows.Cast<DataGridViewRow>();
+            var selectedCertRows = selectedRows.Select(row => (CertificateRow)row.DataBoundItem);
             var selectedRow = selectedCertRows.First();
             return selectedRow;
         }
@@ -365,7 +394,7 @@ namespace CertificateManagement
         private void toolStripMenuItemOpen_Click(object sender, EventArgs e)
         {
             CertificateRow row = GetSelectedRow();
-            X509Certificate2UI.DisplayCertificate(row.certificate);
+            row.Open();
         }
 
         private void toolStripMenuItemExport_Click(object sender, EventArgs e)

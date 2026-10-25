@@ -57,24 +57,27 @@
             dataGridViewCertificates.AllowUserToOrderColumns = true;
             dataGridViewCertificates.AllowUserToResizeRows = false;
             dataGridViewCertificates.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            dataGridViewCertificates.BackgroundColor = System.Drawing.SystemColors.Control;
+            dataGridViewCertificates.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Silver;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.Silver;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.Black;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             dataGridViewCertificates.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dataGridViewCertificates.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCertificates.ContextMenuStrip = contextMenuDataGridRow;
             dataGridViewCertificates.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            dataGridViewCertificates.EnableHeadersVisualStyles = false;
             dataGridViewCertificates.Location = new System.Drawing.Point(2, 28);
             dataGridViewCertificates.Margin = new System.Windows.Forms.Padding(0);
             dataGridViewCertificates.Name = "dataGridViewCertificates";
             dataGridViewCertificates.ReadOnly = true;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -82,7 +85,7 @@
             dataGridViewCertificates.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dataGridViewCertificates.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
             dataGridViewCertificates.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            dataGridViewCertificates.Size = new System.Drawing.Size(930, 413);
+            dataGridViewCertificates.Size = new System.Drawing.Size(930, 428);
             dataGridViewCertificates.TabIndex = 4;
             dataGridViewCertificates.CellContextMenuStripNeeded += dataGridViewCertificates_CellContextMenuStripNeeded;
             dataGridViewCertificates.Sorted += dataGridViewCertificates_Sorted;
@@ -93,51 +96,51 @@
             contextMenuDataGridRow.ImageScalingSize = new System.Drawing.Size(20, 20);
             contextMenuDataGridRow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { toolStripMenuItemOpen, toolStripMenuItemExport, toolStripSeparator1, toolStripMenuItemCopy, toolStripMenuItemDelete, toolStripSeparator2, toolStripMenuItemSelectAll });
             contextMenuDataGridRow.Name = "contextMenuDataGridRow";
-            contextMenuDataGridRow.Size = new System.Drawing.Size(141, 136);
+            contextMenuDataGridRow.Size = new System.Drawing.Size(129, 126);
             // 
             // toolStripMenuItemOpen
             // 
             toolStripMenuItemOpen.Name = "toolStripMenuItemOpen";
-            toolStripMenuItemOpen.Size = new System.Drawing.Size(140, 24);
-            toolStripMenuItemOpen.Text = "Open";
+            toolStripMenuItemOpen.Size = new System.Drawing.Size(128, 22);
+            toolStripMenuItemOpen.Text = "&Open";
             toolStripMenuItemOpen.Click += toolStripMenuItemOpen_Click;
             // 
             // toolStripMenuItemExport
             // 
             toolStripMenuItemExport.Name = "toolStripMenuItemExport";
-            toolStripMenuItemExport.Size = new System.Drawing.Size(140, 24);
-            toolStripMenuItemExport.Text = "Export...";
+            toolStripMenuItemExport.Size = new System.Drawing.Size(128, 22);
+            toolStripMenuItemExport.Text = "&Export...";
             toolStripMenuItemExport.Click += toolStripMenuItemExport_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
+            toolStripSeparator1.Size = new System.Drawing.Size(125, 6);
             // 
             // toolStripMenuItemCopy
             // 
             toolStripMenuItemCopy.Name = "toolStripMenuItemCopy";
-            toolStripMenuItemCopy.Size = new System.Drawing.Size(140, 24);
-            toolStripMenuItemCopy.Text = "Copy";
+            toolStripMenuItemCopy.Size = new System.Drawing.Size(128, 22);
+            toolStripMenuItemCopy.Text = "&Copy";
             toolStripMenuItemCopy.Click += toolStripMenuItemCopy_Click;
             // 
             // toolStripMenuItemDelete
             // 
             toolStripMenuItemDelete.Name = "toolStripMenuItemDelete";
-            toolStripMenuItemDelete.Size = new System.Drawing.Size(140, 24);
-            toolStripMenuItemDelete.Text = "Delete";
+            toolStripMenuItemDelete.Size = new System.Drawing.Size(128, 22);
+            toolStripMenuItemDelete.Text = "&Delete";
             toolStripMenuItemDelete.Click += toolStripMenuItemDelete_Click;
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(137, 6);
+            toolStripSeparator2.Size = new System.Drawing.Size(125, 6);
             // 
             // toolStripMenuItemSelectAll
             // 
             toolStripMenuItemSelectAll.Name = "toolStripMenuItemSelectAll";
-            toolStripMenuItemSelectAll.Size = new System.Drawing.Size(140, 24);
-            toolStripMenuItemSelectAll.Text = "Select All";
+            toolStripMenuItemSelectAll.Size = new System.Drawing.Size(128, 22);
+            toolStripMenuItemSelectAll.Text = "Select &All";
             toolStripMenuItemSelectAll.Click += toolStripMenuItemSelectAll_Click;
             // 
             // btnSaveCellsAs
@@ -173,7 +176,7 @@
             tbSearch.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             tbSearch.Location = new System.Drawing.Point(2, 2);
             tbSearch.Name = "tbSearch";
-            tbSearch.Size = new System.Drawing.Size(248, 27);
+            tbSearch.Size = new System.Drawing.Size(248, 21);
             tbSearch.TabIndex = 9;
             tbSearch.KeyUp += tbSearch_KeyUp;
             // 
@@ -202,7 +205,7 @@
             // CertificateStoreView
             // 
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            ClientSize = new System.Drawing.Size(933, 444);
+            ClientSize = new System.Drawing.Size(933, 459);
             Controls.Add(btnSearchFolder);
             Controls.Add(btnGetPublicKey);
             Controls.Add(tbSearch);
@@ -236,6 +239,6 @@
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemDelete;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSelectAll;
-	}
+    }
 }
 

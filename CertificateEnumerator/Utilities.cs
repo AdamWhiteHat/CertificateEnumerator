@@ -12,189 +12,209 @@ using System.Windows.Forms;
 
 namespace CertificateManagement
 {
-	public static class Utilities
-	{
-		public static string ToDownloadFilename = "CRLs_ToDownload.txt";
+    public static class Utilities
+    {
+        public static string ToDownloadFilename = "CRLs_ToDownload.txt";
 
-		public static string SuccessfullyDownloadedFilename = "CRLs_SuccessfullyDownloaded.txt";
-		public static string FailedDownloadsFilename = "CRLs_FailedDownloads.txt";
+        public static string SuccessfullyDownloadedFilename = "CRLs_SuccessfullyDownloaded.txt";
+        public static string FailedDownloadsFilename = "CRLs_FailedDownloads.txt";
 
-		public static string SuccessfullyInstalledFilename = "CRLs_SuccessfullyInstalled.txt";
-		public static string FailedInstallsFilename = "CRLs_FailedInstalls.txt";
+        public static string SuccessfullyInstalledFilename = "CRLs_SuccessfullyInstalled.txt";
+        public static string FailedInstallsFilename = "CRLs_FailedInstalls.txt";
 
-		public static string PublicKeysStoreOutputFilename = "PublicKeys.Store.Output.txt";
-		public static string PublicKeysFolderOutputFilename = "PublicKeys.Folder.Output.txt";
+        public static string PublicKeysStoreOutputFilename = "PublicKeys.Store.Output.txt";
+        public static string PublicKeysFolderOutputFilename = "PublicKeys.Folder.Output.txt";
 
-		public static string DownloadPath = Path.GetFullPath(Settings.CRL_DownloadPath);
-		public static string CertUtilExecutable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "CertUtil.exe");
+        public static string DownloadPath = Path.GetFullPath(Settings.CRL_DownloadPath);
+        public static string CertUtilExecutable = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "CertUtil.exe");
 
-		private static string dashedLine = "---";
-		private static BigInteger ByteMax = new BigInteger(256);
-		public static int WebRequestTimeout = 2000;
+        private static string dashedLine = "---";
+        private static BigInteger ByteMax = new BigInteger(256);
+        public static int WebRequestTimeout = 2000;
 
-		public static List<string> GetTimestampLogfileHeader()
-		{
-			DateTime now = DateTime.Now;
+        public static List<string> GetTimestampLogfileHeader()
+        {
+            DateTime now = DateTime.Now;
 
-			return new List<string>() { Environment.NewLine, $"{dashedLine} {now.ToLongDateString()} @ {now.ToLongTimeString()}" };
-		}
+            return new List<string>() { Environment.NewLine, $"{dashedLine} {now.ToLongDateString()} @ {now.ToLongTimeString()}" };
+        }
 
-		public static List<string> WrapLinesForLogging(IEnumerable<string> lines)
-		{
-			List<string> results = GetTimestampLogfileHeader(); // Header
+        public static List<string> WrapLinesForLogging(IEnumerable<string> lines)
+        {
+            List<string> results = GetTimestampLogfileHeader(); // Header
 
-			results.AddRange(lines); // Body
+            results.AddRange(lines); // Body
 
-			results.Add(dashedLine); // Footer
+            results.Add(dashedLine); // Footer
 
-			return results;
-		}
+            return results;
+        }
 
-		public static void EnsureDirectoryExists(string path)
-		{
-			if (!Directory.Exists(path))
-			{
-				Directory.CreateDirectory(path);
-			}
-		}
+        public static void EnsureDirectoryExists(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
 
-		public static string EnsureFilenameNotExists(string filename)
-		{
-			int counter = 1;
-			string result = filename;
-			string extension = Path.GetExtension(result);
-			while (File.Exists(result))
-			{
-				result = Path.ChangeExtension(result, string.Concat(".", counter.ToString().PadLeft(3, '0'), extension));
-				counter++;
-			}
-			return result;
-		}
+        public static string EnsureFilenameNotExists(string filename)
+        {
+            int counter = 1;
+            string result = filename;
+            string extension = Path.GetExtension(result);
+            while (File.Exists(result))
+            {
+                result = Path.ChangeExtension(result, string.Concat(".", counter.ToString().PadLeft(3, '0'), extension));
+                counter++;
+            }
+            return result;
+        }
 
-		public static List<X509Certificate2> SearchForCertsInFolder(string path)
-		{
-			if (string.IsNullOrWhiteSpace(path)) { throw new ArgumentException("Argument path must not be null, empty or whitespace", "path"); }
-			if (!Directory.Exists(path)) { throw new DirectoryNotFoundException("Path must exist: " + path); }
+        public static List<X509Certificate2> SearchForCertsInFolder(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            { throw new ArgumentException("Argument path must not be null, empty or whitespace", "path"); }
+            if (!Directory.Exists(path))
+            { throw new DirectoryNotFoundException("Path must exist: " + path); }
 
-			IEnumerable<string> filePaths = Directory.EnumerateFiles(path, "*.cer", SearchOption.TopDirectoryOnly);
+            IEnumerable<string> filePaths = Directory.EnumerateFiles(path, "*.cer", SearchOption.TopDirectoryOnly);
 
-			List<X509Certificate2> results = new List<X509Certificate2>();
-			foreach (string file in filePaths)
-			{
-				X509Certificate2 cert = new X509Certificate2(file);
-				results.Add(cert);
-			}
-			return results;
-		}
+            List<X509Certificate2> results = new List<X509Certificate2>();
+            foreach (string file in filePaths)
+            {
+                X509Certificate2 cert = new X509Certificate2(file);
+                results.Add(cert);
+            }
+            return results;
+        }
 
-		public static List<string> GetCRLsToDownloadURLs()
-		{
-			string todownloadFilepath = Path.Combine(Utilities.DownloadPath, Utilities.ToDownloadFilename);
-			if (File.Exists(todownloadFilepath))
-			{
-				IEnumerable<string> additionalUrls = File.ReadAllLines(todownloadFilepath).Select(line => line.Trim()).Where(line => !string.IsNullOrWhiteSpace(line));
+        public static List<string> GetCRLsToDownloadURLs()
+        {
+            string todownloadFilepath = Path.Combine(Utilities.DownloadPath, Utilities.ToDownloadFilename);
+            if (File.Exists(todownloadFilepath))
+            {
+                IEnumerable<string> additionalUrls = File.ReadAllLines(todownloadFilepath).Select(line => line.Trim()).Where(line => !string.IsNullOrWhiteSpace(line));
 
-				if (additionalUrls.Any())
-				{
-					return additionalUrls.ToList();
-				}
-			}
+                if (additionalUrls.Any())
+                {
+                    return additionalUrls.ToList();
+                }
+            }
 
-			return new List<string>();
-		}
+            return new List<string>();
+        }
 
-		public static List<string> InstallCertificateRevocationLists(List<string> crlFilenames)
-		{
-			List<string> installedCRLs = new List<string>();
-			List<string> faildCRLs = new List<string>();
+        public static bool ExecuteCommandLine(string executablePath, string arguments)
+        {
+            bool result = false;
+            using (Process process = new Process())
+            {
+                process.StartInfo = new ProcessStartInfo(executablePath, arguments)
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+                result = process.Start();
+                process.WaitForExit();
+                process.Close();
+            }
+            return result;
+        }
 
-			foreach (string file in crlFilenames)
-			{
-				if (!File.Exists(file))
-				{
-					faildCRLs.Add(file);
-					continue;
-				}
+        internal static BigInteger CalculateValue(byte[] input)
+        {
+            byte[] localCopy = new List<byte>(input).ToArray();
+            Array.Reverse(localCopy);
 
-				if (Utilities.InstallCRL(file))
-				{
-					installedCRLs.Add(file);
-				}
-				else
-				{
-					faildCRLs.Add(file);
-				}
-			}
+            int counter = 0;
+            BigInteger placeValue = new BigInteger(0);
+            BigInteger result = new BigInteger(0);
+            foreach (byte octet in localCopy)
+            {
+                placeValue = BigInteger.Pow(ByteMax, counter);
+                placeValue *= octet;
+                result += placeValue;
+                counter++;
+            }
+            return result;
+        }
 
-			if (faildCRLs.Any())
-			{
-				string failedFilepath = Path.Combine(Utilities.DownloadPath, Utilities.FailedInstallsFilename);
-				File.AppendAllLines(failedFilepath, WrapLinesForLogging(faildCRLs));
-			}
+        public static List<CertificateRevocationRow> DownloadCRLs(List<CertificateRevocationRow> forRows)
+        {
+            List<CertificateRevocationRow> results = new List<CertificateRevocationRow>();
+            List<Tuple<Uri, FileInfo>> successCRLs = new List<Tuple<Uri, FileInfo>>();
+            List<Tuple<Uri, FileInfo>> failedCRLs = new List<Tuple<Uri, FileInfo>>();
 
-			if (installedCRLs.Any())
-			{
-				string successfulFilepath = Path.Combine(Utilities.DownloadPath, Utilities.SuccessfullyInstalledFilename);
-				File.AppendAllLines(successfulFilepath, WrapLinesForLogging(installedCRLs));
-			}
+            Utilities.EnsureDirectoryExists(Utilities.DownloadPath);
 
-			return installedCRLs;
-		}
+            using (WebClientWithTimeout client = new WebClientWithTimeout(Utilities.WebRequestTimeout))
+            {
+                foreach (CertificateRevocationRow certificateRevocationRow in forRows)
+                {
+                    bool result = certificateRevocationRow.Download(client);
 
-		private static bool InstallCRL(string crlFilepath)
-		{
-			if (!File.Exists(crlFilepath) || !File.Exists(CertUtilExecutable))
-			{
-				return false;
-			}
+                    if (result)
+                    {
+                        successCRLs.Add(new Tuple<Uri, FileInfo>(new Uri(certificateRevocationRow.CrlURL), new FileInfo(certificateRevocationRow.LocallySavedFilepath)));
+                        results.Add(certificateRevocationRow);
+                    }
+                    else
+                    {
+                        failedCRLs.Add(new Tuple<Uri, FileInfo>(new Uri(certificateRevocationRow.CrlURL), new FileInfo(certificateRevocationRow.LocallySavedFilepath)));
+                    }
+                }
+            }
 
-			try
-			{
-				bool result = ExecuteCommandLine(CertUtilExecutable, $"-addstore -f Disallowed \"{crlFilepath}\"");
-				return result;
-			}
-			catch (Exception ex)
-			{
-				SettingsReader.LogException(ex);
-				string exceptionType = ex.GetType().ToString();
-				string message = ex.ToString();
-				MessageBox.Show(message, exceptionType, MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return false;
-			}
-		}
+            if (failedCRLs.Any())
+            {
+                string errorFilepath = Path.Combine(Utilities.DownloadPath, Utilities.FailedDownloadsFilename);
+                File.AppendAllLines(errorFilepath, Utilities.WrapLinesForLogging(failedCRLs.Select(tup => string.Format("\tURL: {0,-75} DEST: \"{1}\"", $"\"{tup.Item1.ToString()}\"", tup.Item2.FullName))));
+            }
 
-		public static bool ExecuteCommandLine(string executablePath, string arguments)
-		{
-			bool result = false;
-			using (Process process = new Process())
-			{
-				process.StartInfo = new ProcessStartInfo(executablePath, arguments)
-				{
-					WindowStyle = ProcessWindowStyle.Hidden
-				};
-				result = process.Start();
-				process.WaitForExit();
-				process.Close();
-			}
-			return result;
-		}
+            if (successCRLs.Any())
+            {
+                string successFilepath = Path.Combine(Utilities.DownloadPath, Utilities.SuccessfullyDownloadedFilename);
+                File.AppendAllLines(successFilepath, Utilities.WrapLinesForLogging(successCRLs.Select(tup => string.Format("\tURL: {0,-75} DEST: \"{1}\"", $"\"{tup.Item1.ToString()}\"", tup.Item2.FullName))));
+            }
 
-		internal static BigInteger CalculateValue(byte[] input)
-		{
-			byte[] localCopy = new List<byte>(input).ToArray();
-			Array.Reverse(localCopy);
+            return results;
+        }
 
-			int counter = 0;
-			BigInteger placeValue = new BigInteger(0);
-			BigInteger result = new BigInteger(0);
-			foreach (byte octet in localCopy)
-			{
-				placeValue = BigInteger.Pow(ByteMax, counter);
-				placeValue *= octet;
-				result += placeValue;
-				counter++;
-			}
-			return result;
-		}
-	}
+        public static List<CertificateRevocationRow> InstallCRLs(List<CertificateRevocationRow> forRows)
+        {
+            if (!File.Exists(CertUtilExecutable))
+            {
+                return new List<CertificateRevocationRow>();
+            }
+
+            List<CertificateRevocationRow> installedCRLs = new List<CertificateRevocationRow>();
+            List<CertificateRevocationRow> faildCRLs = new List<CertificateRevocationRow>();
+
+            foreach (CertificateRevocationRow row in forRows)
+            {
+                if (row.Install())
+                {
+                    installedCRLs.Add(row);
+                }
+                else
+                {
+                    faildCRLs.Add(row);
+                }
+            }
+
+            if (faildCRLs.Any())
+            {
+                string failedFilepath = Path.Combine(Utilities.DownloadPath, Utilities.FailedInstallsFilename);
+                File.AppendAllLines(failedFilepath, WrapLinesForLogging(faildCRLs.Select(row => row.LocallySavedFilepath)));
+            }
+
+            if (installedCRLs.Any())
+            {
+                string successfulFilepath = Path.Combine(Utilities.DownloadPath, Utilities.SuccessfullyInstalledFilename);
+                File.AppendAllLines(successfulFilepath, WrapLinesForLogging(installedCRLs.Select(row => row.LocallySavedFilepath)));
+            }
+
+            return installedCRLs;
+        }
+    }
 }

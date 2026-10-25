@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5.0-windows</TargetFrameworks>
+		<TargetFrameworks>net8.0-windows</TargetFrameworks>
 		<OutputType>WinExe</OutputType>
 		<UseWindowsForms>True</UseWindowsForms>
 	</PropertyGroup>
@@ -57,6 +57,10 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
 	</ItemGroup>
 
 	<ItemGroup>
